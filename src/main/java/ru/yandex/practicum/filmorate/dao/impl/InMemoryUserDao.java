@@ -30,9 +30,9 @@ public class InMemoryUserDao implements UserDao {
 
     @Override
     public Optional<User> findById(Long id) {
-        log.debug("Поиск пользователя по id: {}", id);
+        log.info("Поиск пользователя по id: {}", id);
         if (!users.containsKey(id)) {
-            log.debug("Пользователя с ID: {} не существует", id);
+            log.info("Пользователя с ID: {} не существует", id);
             return Optional.empty();
         } else {
             log.info("Пользователь с ID {} найден", id);
@@ -42,7 +42,7 @@ public class InMemoryUserDao implements UserDao {
 
     @Override
     public Long findMaxId() {
-        log.debug("Поиск максимального значения Id среди существующих пользователей");
+        log.info("Поиск максимального значения Id среди существующих пользователей");
         return users.keySet()
                 .stream()
                 .mapToLong(id -> id)

@@ -31,7 +31,7 @@ public class InMemoryFilmDao implements FilmDao {
 
     @Override
     public Optional<Film> findById(Long id) {
-        log.debug("Поиск фильма по id: {}", id);
+        log.info("Поиск фильма по id: {}", id);
         if (films.containsKey(id)) {
             return Optional.of(films.get(id));
         }
@@ -40,7 +40,7 @@ public class InMemoryFilmDao implements FilmDao {
 
     @Override
     public Long findMaxId() {
-        log.debug("Поиск максимального значения Id среди существующих фильмов");
+        log.info("Поиск максимального значения Id среди существующих фильмов");
         return films.keySet()
                 .stream()
                 .mapToLong(id -> id)

@@ -10,12 +10,8 @@ import ru.yandex.practicum.filmorate.annotations.AfterFirstFilmDate;
 
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
 public class Film {
-    private static final Logger log = LoggerFactory.getLogger(Film.class);
     private Long id;
     @NotBlank(message = "Название не должно быть пустым")
     private String name;
