@@ -70,12 +70,12 @@ public class FilmService {
         log.info("Лайк добавлен");
     }
 
-    public void deleteLike(Long id, Long userId) {
-        log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}",id , userId);
+    public void deleteLike(Long filmId, Long userId) {
+        log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}",filmId , userId);
         userStorage.findById(userId);
-        log.info("Фильм найден");
-        filmStorage.findById(id)
-                .orElseThrow(() -> new FilmNotFoundException(id))
+        log.info("Пользователь с id={} найден", userId);
+        filmStorage.findById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException(filmId))
                 .getLikes()
                 .remove(userId);
         log.info("Лайк удален");
