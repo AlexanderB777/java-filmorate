@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -30,15 +27,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findById(Long id) {
+    public Optional<User> findById(Long id) {
         log.info("Поиск пользователя по id: {}", id);
-        if (!users.containsKey(id)) {
-            log.info("Пользователя с ID: {} не существует", id);
-            throw new UserNotFoundException(id);
-        } else {
-            log.info("Пользователь с ID {} найден", id);
-            return users.get(id);
-        }
+        return Optional.of(users.get(id));
     }
 
     @Override

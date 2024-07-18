@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
@@ -32,9 +33,9 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         Long id = film.getId();
-        log.info("Получен запрос на обновление фильма с Id=%d".formatted(id));
-        Film storedFilm = filmStorage.findById(id);
-        log.info("Фильм с id=%d найден".formatted(id));
+        log.info("Получен запрос на обновление фильма с Id={}", id);
+        Film storedFilm = filmStorage.findById(id).orElseThrow(() -> new FilmNotFoundException(id));
+        log.info("Фильм с id={} найден", id);
         storedFilm.setName(film.getName());
         storedFilm.setDescription(film.getDescription());
         storedFilm.setReleaseDate(film.getReleaseDate());
@@ -48,7 +49,7 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        log.info("Вызван метод по поиску популярных фильмов в количестве %d".formatted(count));
+        log.info("Вызван метод по поиску популярных фильмов в количестве {}", count);
         List<Film> all = filmStorage.findAll();
         List<Film> result = all.stream()
                 .sorted(new FilmByLikeComparator().reversed())
@@ -59,18 +60,24 @@ public class FilmService {
     }
 
     public void putLike(Long id, Long userId) {
-        log.info("Вызван метод по добавлению лайка фильму с id=%d пользователем с id=%d".formatted(id, userId));
+        log.info("Вызван метод по добавлению лайка фильму с id={} пользователем с id={}", id, userId);
         userStorage.findById(userId);
         log.info("Фильм найден");
-        filmStorage.findById(id).getLikes().add(userId);
+        filmStorage.findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id))
+                .getLikes()
+                .add(userId);
         log.info("Лайк добавлен");
     }
 
     public void deleteLike(Long id, Long userId) {
-        log.info("Вызван метод по удалению лайка фильму с id=%d пользователем с id=%d".formatted(id, userId));
+        log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}",id , userId);
         userStorage.findById(userId);
         log.info("Фильм найден");
-        filmStorage.findById(id).getLikes().remove(userId);
+        filmStorage.findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id))
+                .getLikes()
+                .remove(userId);
         log.info("Лайк удален");
     }
 }

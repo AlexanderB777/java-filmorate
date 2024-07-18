@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -33,10 +30,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public Film findById(Long id) {
+    public Optional<Film> findById(Long id) {
         log.info("Поиск фильма по id: {}", id);
-        if (!films.containsKey(id)) throw new FilmNotFoundException(id);
-        return films.get(id);
+        return Optional.of(films.get(id));
     }
 
     @Override

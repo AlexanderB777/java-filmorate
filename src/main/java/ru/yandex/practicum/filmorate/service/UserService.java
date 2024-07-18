@@ -6,10 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,7 +37,7 @@ public class UserService {
 
     public User updateUser(User user) {
         Long id = user.getId();
-        User foundedUser = userStorage.findById(id);
+        User foundedUser = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         foundedUser.setEmail(user.getEmail());
         foundedUser.setLogin(user.getLogin());
         foundedUser.setName(user.getName());
@@ -49,10 +52,10 @@ public class UserService {
 
     public void createFriendship(Long id, Long friendId) {
         log.info("Вызван метод создающий дружбу между пользователями с Id=%d и Id=%d".formatted(id, friendId));
-        User user = userStorage.findById(id);
-        log.info("Пользователь с id=%d найден".formatted(id));
-        User friend = userStorage.findById(friendId);
-        log.info("Пользователь с id=%d найден".formatted(friendId));
+        User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Пользователь с id={} найден", id);
+        User friend = userStorage.findById(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
+        log.info("Пользователь с id={} найден", friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(id);
         log.info("Дружба создана");
@@ -60,33 +63,41 @@ public class UserService {
 
     public void removeFriendship(Long id, Long friendId) {
         log.info("Вызван метод удаляющий дружбу между пользователями с Id=%d и Id=%d".formatted(id, friendId));
-        User user = userStorage.findById(id);
-        log.info("Пользователь с id=%d найден".formatted(id));
-        User friend = userStorage.findById(friendId);
-        log.info("Пользователь с id=%d найден".formatted(friendId));
+        User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Пользователь с id={} найден", id);
+        User friend = userStorage.findById(friendId).orElseThrow(() -> new NotFoundException(friendId));
+        log.info("Пользователь с id={} найден", friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
         log.info("Дружба удалена");
     }
 
     public ResponseEntity<List<User>> getAllFriendsFromUser(Long id) {
-        log.info("Вызван метод для получения списка друзей пользователя с id=%d".formatted(id));
-        User user = userStorage.findById(id);
-        log.info("Пользователь с id=%d найден".formatted(id));
+        log.info("Вызван метод для получения списка друзей пользователя с id={}", id);
+        User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Пользователь с id={} найден", id);
         Set<Long> friends = user.getFriends();
         if (friends.isEmpty()) return ResponseEntity.ok(new ArrayList<>());
         return ResponseEntity.ok(
                 user.getFriends().stream()
                         .map(userStorage::findById)
+                        .map(Optional::orElseThrow)
                         .toList());
     }
 
     public ResponseEntity<List<User>> getCommonFriends(Long id, Long friendId) {
         log.info("Вызван метод по поиску общих друзей пользователей с id=%d и id=%d".formatted(id, friendId));
-        Set<Long> commonFriends = userStorage.findById(id).getFriends();
-        commonFriends.retainAll(userStorage.findById(friendId).getFriends());
+        Set<Long> commonFriends = userStorage
+                .findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id))
+                .getFriends();
+        commonFriends.retainAll(userStorage
+                .findById(friendId)
+                .orElseThrow(() -> new UserNotFoundException(friendId))
+                .getFriends());
         return ResponseEntity.ok(commonFriends.stream().
                 map(userStorage::findById)
+                .map(Optional::orElseThrow)
                 .toList());
     }
 }
