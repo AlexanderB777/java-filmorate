@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Optional<Film> findById(Long id) {
         log.info("Поиск фильма по id: {}", id);
-        return Optional.of(films.get(id));
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override

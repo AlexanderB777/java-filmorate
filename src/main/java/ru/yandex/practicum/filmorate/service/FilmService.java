@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
@@ -61,7 +62,7 @@ public class FilmService {
 
     public void putLike(Long id, Long userId) {
         log.info("Вызван метод по добавлению лайка фильму с id={} пользователем с id={}", id, userId);
-        userStorage.findById(userId);
+        userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Фильм найден");
         filmStorage.findById(id)
                 .orElseThrow(() -> new FilmNotFoundException(id))
@@ -72,7 +73,7 @@ public class FilmService {
 
     public void deleteLike(Long filmId, Long userId) {
         log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}",filmId , userId);
-        userStorage.findById(userId);
+        userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Пользователь с id={} найден", userId);
         filmStorage.findById(filmId)
                 .orElseThrow(() -> new FilmNotFoundException(filmId))
