@@ -2,17 +2,15 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.UserDao;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
-public class InMemoryUserDao implements UserDao {
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
@@ -23,21 +21,15 @@ public class InMemoryUserDao implements UserDao {
     }
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         log.info("Получение списка всех пользователей");
-        return users.values();
+        return new ArrayList<>(users.values());
     }
 
     @Override
     public Optional<User> findById(Long id) {
         log.info("Поиск пользователя по id: {}", id);
-        if (!users.containsKey(id)) {
-            log.info("Пользователя с ID: {} не существует", id);
-            return Optional.empty();
-        } else {
-            log.info("Пользователь с ID {} найден", id);
-            return Optional.of(users.get(id));
-        }
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override

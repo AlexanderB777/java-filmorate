@@ -2,18 +2,17 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.FilmDao;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
-public class InMemoryFilmDao implements FilmDao {
+public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
+
 
     @Override
     public Film save(Film film) {
@@ -23,19 +22,17 @@ public class InMemoryFilmDao implements FilmDao {
     }
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         log.info("Получение списка всех фильмов");
-        return films.values();
+        System.out.println(films.values());
+        return new ArrayList<>(films.values());
     }
 
 
     @Override
     public Optional<Film> findById(Long id) {
         log.info("Поиск фильма по id: {}", id);
-        if (films.containsKey(id)) {
-            return Optional.of(films.get(id));
-        }
-        return Optional.empty();
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
