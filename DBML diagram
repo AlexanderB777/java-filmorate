@@ -1,0 +1,42 @@
+Table users {
+  user_id Long [pk, increment] // Primary key
+  email String [not null, unique]
+  login String [not null, unique]
+  name String
+  birthday Date
+}
+
+Table films {
+  film_id Long [pk, increment] // Primary key
+  name String [not null]
+  description String [note: "Max length 200"]
+  release_date Date
+  duration Int [not null]
+  genre_id Long [ref: > genres.genre_id]
+  rating_id Long [ref: > ratings.rating_id]
+}
+
+Table genres {
+  genre_id Long [pk, increment] // Primary key
+  name String [not null]
+}
+
+Table ratings {
+  rating_id Long [pk, increment] // Primary key
+  name String [not null]
+}
+
+Table friends {
+  user_id Long [ref: > users.user_id]
+  friend_id Long [ref: > users.user_id]
+}
+
+Table likes {
+  user_id Long [ref: > users.user_id]
+  film_id Long [ref: > films.film_id]
+}
+
+Table unconfirmed_friends {
+  user_id Long [ref: > users.user_id]
+  friend_id Long [ref: > users.user_id]
+}
