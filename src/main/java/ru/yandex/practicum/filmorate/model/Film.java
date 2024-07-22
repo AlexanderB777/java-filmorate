@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.utils.AfterFirstFilmDate;
+import ru.yandex.practicum.filmorate.utils.Genre;
+import ru.yandex.practicum.filmorate.utils.Rating;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -21,6 +23,8 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Продолжительность должна быть положительным числом")
     private int duration;
+    private Genre genre;
+    private Rating rating;
 
     private Set<Long> likes = new HashSet<>();
 }
