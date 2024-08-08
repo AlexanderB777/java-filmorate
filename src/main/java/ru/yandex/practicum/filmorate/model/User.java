@@ -13,12 +13,12 @@ import java.util.Set;
 @Data
 public class User {
     private Long id;
-    @Email
-    private String email;
     @NotBlank
     @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
     private String login;
     private String name;
+    @Email
+    private String email;
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
@@ -15,10 +15,15 @@ import java.util.List;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Collection<Film> findAll() {
         log.info("Получен запрос на получение всех фильмов");
@@ -72,7 +77,7 @@ public class FilmService {
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}",filmId , userId);
+        log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}", filmId, userId);
         userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Пользователь с id={} найден", userId);
         filmStorage.findById(filmId)
