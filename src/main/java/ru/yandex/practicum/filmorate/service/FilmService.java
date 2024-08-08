@@ -32,7 +32,7 @@ public class FilmService {
 
     public Film createFilm(Film film) {
         log.info("Получен запрос на создание фильма: {}", film);
-        film.setId(getNextId());
+        film.setId(getNextId()); //Проверить как он работает с реализацией filmDbStorage
         film = filmStorage.save(film);
         return film;
     }
