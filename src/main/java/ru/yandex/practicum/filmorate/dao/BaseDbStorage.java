@@ -16,6 +16,7 @@ import java.util.Optional;
 public abstract class BaseDbStorage<T> {
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> rowMapper;
+    private static final String FILM_MAX_ID_QUERY = "SELECT MAX(id) FROM films";
 
     protected Optional<T> findOne(String query, Object... params) {
         try {
@@ -58,5 +59,14 @@ public abstract class BaseDbStorage<T> {
         } else {
             throw new RuntimeException("Не удалось сохранить данные");
         }
+    }
+
+    protected Long findMaxId() {
+
+        Long maxId = jdbcTemplate.queryForObject(FILM_MAX_ID_QUERY, Long.class);
+        if (maxId == null) {
+            return 0L;
+        }
+        return maxId;
     }
 }

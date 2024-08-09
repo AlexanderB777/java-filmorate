@@ -23,6 +23,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                                                                   "duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE users SET username = ?, email = ?, birthday = ? WHERE id = ?";
     private static final String INSERT_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES(?, ?)";
+    private static final String MAX_ID_QUERY = "SELECT MAX(id) FROM films";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Film> rowMapper) {
         super(jdbcTemplate, rowMapper);
@@ -47,16 +48,16 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-        return List.of();
+        return findMany(FIND_ALL_QUERY);
     }
 
     @Override
     public Optional<Film> findById(Long id) {
-        return Optional.empty();
+        return findOne(FIND_BY_ID_QUERY, id);
     }
 
     @Override
     public Long findMaxId() {
-        return 0L;
+        return super.findMaxId();
     }
 }
