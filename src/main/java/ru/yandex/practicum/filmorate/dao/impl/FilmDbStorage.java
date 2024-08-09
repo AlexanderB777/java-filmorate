@@ -20,8 +20,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_ALL_QUERY = "select * from films";
     private static final String FIND_BY_ID_QUERY = "select * from films where id = ?";
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, release_date, " +
-                                                                  "duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE users SET username = ?, email = ?, birthday = ? WHERE id = ?";
+            "duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, " +
+            "duration = ?, mpa_id =? WHERE id = ?";
     private static final String INSERT_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES(?, ?)";
     private static final String MAX_ID_QUERY = "SELECT MAX(id) FROM films";
 
@@ -31,18 +32,28 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Film save(Film film) {
-        log.info("Сохранение фильма с названием: {}", film.getName());
-        long id = insert(INSERT_QUERY,
-                film.getName(),
-                film.getDescription(),
-                Date.valueOf(film.getReleaseDate()),
-                film.getDuration(),
-                film.getMpa().getId()
-                );
-        for (Genre genre : film.getGenres()) {
-            insert(INSERT_GENRES_QUERY, id, genre.getId());
+        log.info("Сохранение фильма:", film);
+        if (film.getId() == null) {
+            long id = insert(INSERT_QUERY,
+                    film.getName(),
+                    film.getDescription(),
+                    Date.valueOf(film.getReleaseDate()),
+                    film.getDuration(),
+                    film.getMpa().getId()
+            );
+            for (Genre genre : film.getGenres()) {
+                insert(INSERT_GENRES_QUERY, id, genre.getId());
+            }
+            film.setId(id);
+        } else {
+            update(UPDATE_QUERY,
+                    film.getName(),
+                    film.getDescription(),
+                    Date.valueOf(film.getReleaseDate()),
+                    film.getDuration(),
+                    film.getMpa().getId(),
+                    film.getId());
         }
-        film.setId(id);
         return film;
     }
 

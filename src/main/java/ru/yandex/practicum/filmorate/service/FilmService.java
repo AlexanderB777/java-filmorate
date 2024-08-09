@@ -32,20 +32,21 @@ public class FilmService {
 
     public Film createFilm(Film film) {
         log.info("Получен запрос на создание фильма: {}", film);
-        film.setId(getNextId()); //Проверить как он работает с реализацией filmDbStorage
+//        film.setId(getNextId()); //Проверить как он работает с реализацией filmDbStorage
         film = filmStorage.save(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
         Long id = film.getId();
-        log.info("Получен запрос на обновление фильма с Id={}", id);
+        log.info("Получен запрос на обновление фильма:", film);
         Film storedFilm = filmStorage.findById(id).orElseThrow(() -> new FilmNotFoundException(id));
-        log.info("Фильм с id={} найден", id);
+        log.info("Фильм с id={} найден", film);
         storedFilm.setName(film.getName());
         storedFilm.setDescription(film.getDescription());
         storedFilm.setReleaseDate(film.getReleaseDate());
         storedFilm.setDuration(film.getDuration());
+        storedFilm.setMpa(film.getMpa());
         log.info("Фильм успешно обновлен");
         return filmStorage.save(storedFilm);
     }
