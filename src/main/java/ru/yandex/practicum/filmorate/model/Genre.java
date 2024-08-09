@@ -9,4 +9,5 @@ public class Genre {
     @Max(6)
     @Positive
     private int id;
+    private String name;
 }

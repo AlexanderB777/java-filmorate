@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -86,5 +87,10 @@ public class FilmService {
                 .getLikes()
                 .remove(userId);
         log.info("Лайк удален");
+    }
+
+    public Film getFilmById(Long id) {
+        Optional<Film> film = filmStorage.findById(id);
+        return film.orElseThrow(() -> new FilmNotFoundException(id));
     }
 }

@@ -30,6 +30,12 @@ public class FilmController {
         return filmService.createFilm(film);
     }
 
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable Long id) {
+        log.debug("Получен запрос на получение фильма с ID: {}", id);
+        return filmService.getFilmById(id);
+    }
+
     @PutMapping
     public ResponseEntity<Film> update(@Valid @RequestBody Film film) {
         log.debug("Получен запрос на обновление фильма с ID: {}", film.getId());
