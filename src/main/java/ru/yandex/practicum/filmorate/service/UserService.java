@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        user.setId(getNextId());
+//        user.setId(getNextId()); Переделать для inMemory
         if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
