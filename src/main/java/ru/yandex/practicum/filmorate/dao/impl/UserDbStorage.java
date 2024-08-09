@@ -20,6 +20,9 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
             "VALUES (?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE users SET login = ?, name = ?, email = ?, birthday = ? " +
             "WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
+    private static final String USER_MAX_ID_QUERY = "SELECT MAX(id) FROM users";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate, RowMapper<User> rowMapper) {
         super(jdbcTemplate, rowMapper);
@@ -47,16 +50,16 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return findMany(FIND_ALL_QUERY);
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return Optional.empty();
+        return findOne(FIND_BY_ID_QUERY, id);
     }
 
     @Override
     public Long findMaxId() {
-        return 0L;
+        return super.findMaxId(USER_MAX_ID_QUERY);
     }
 }

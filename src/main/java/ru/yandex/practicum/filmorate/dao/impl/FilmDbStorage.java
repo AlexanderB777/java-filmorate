@@ -25,6 +25,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "duration = ?, mpa_id =? WHERE id = ?";
     private static final String INSERT_GENRES_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES(?, ?)";
     private static final String MAX_ID_QUERY = "SELECT MAX(id) FROM films";
+    private static final String FILM_MAX_ID_QUERY = "SELECT MAX(id) FROM films";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Film> rowMapper) {
         super(jdbcTemplate, rowMapper);
@@ -69,6 +70,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Long findMaxId() {
-        return super.findMaxId();
+        return super.findMaxId(FILM_MAX_ID_QUERY);
     }
 }
