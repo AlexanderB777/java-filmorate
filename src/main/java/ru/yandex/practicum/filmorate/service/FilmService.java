@@ -33,14 +33,13 @@ public class FilmService {
 
     public Film createFilm(Film film) {
         log.info("Получен запрос на создание фильма: {}", film);
-//        film.setId(getNextId()); //Проверить как он работает с реализацией filmDbStorage
         film = filmStorage.save(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
         Long id = film.getId();
-        log.info("Получен запрос на обновление фильма:", film);
+        log.info("Получен запрос на обновление фильма: {}", film);
         Film storedFilm = filmStorage.findById(id).orElseThrow(() -> new FilmNotFoundException(id));
         log.info("Фильм с id={} найден", film);
         storedFilm.setName(film.getName());
@@ -50,10 +49,6 @@ public class FilmService {
         storedFilm.setMpa(film.getMpa());
         log.info("Фильм успешно обновлен");
         return filmStorage.save(storedFilm);
-    }
-
-    private long getNextId() {
-        return filmStorage.findMaxId() + 1;
     }
 
     public List<Film> getPopularFilms(int count) {
@@ -67,14 +62,11 @@ public class FilmService {
         return result;
     }
 
-    public void putLike(Long id, Long userId) {
+    public void putLike(long id, long userId) {
         log.info("Вызван метод по добавлению лайка фильму с id={} пользователем с id={}", id, userId);
         userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Фильм найден");
-        filmStorage.findById(id)
-                .orElseThrow(() -> new FilmNotFoundException(id))
-                .getLikes()
-                .add(userId);
+        filmStorage.putLike(id, userId);
         log.info("Лайк добавлен");
     }
 
@@ -82,10 +74,7 @@ public class FilmService {
         log.info("Вызван метод по удалению лайка фильму с id={} пользователем с id={}", filmId, userId);
         userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Пользователь с id={} найден", userId);
-        filmStorage.findById(filmId)
-                .orElseThrow(() -> new FilmNotFoundException(filmId))
-                .getLikes()
-                .remove(userId);
+        filmStorage.deleteLike(filmId, userId);
         log.info("Лайк удален");
     }
 

@@ -13,4 +13,10 @@ public interface UserStorage {
     Optional<User> findById(Long id);
 
     Long findMaxId();
+
+    boolean checkReverseFriendship(long userId, long friendId);
+
+    void confirmFriendship(long userId,long friendId);
+
+    void createFriendshipRequest(long userId, long friendId);
 }

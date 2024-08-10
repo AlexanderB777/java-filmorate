@@ -26,7 +26,7 @@ public class Film {
     @Valid
     private List<Genre> genres;
     @Valid
-    private Mpa mpa;
+    private Mpa mpa = new Mpa();
     private Set<Long> likes = new HashSet<>();
 
     public @Valid List<Genre> getGenres() {

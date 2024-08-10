@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class BaseDbStorage<T> {
     protected final JdbcTemplate jdbcTemplate;
@@ -19,8 +21,10 @@ public abstract class BaseDbStorage<T> {
     protected Optional<T> findOne(String query, Object... params) {
         try {
             T result = jdbcTemplate.queryForObject(query, rowMapper, params);
+            log.debug("Фильм в базе найден");
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException ignored) {
+            log.debug("Фильм не найден в базе");
             return Optional.empty();
         }
     }
@@ -29,9 +33,11 @@ public abstract class BaseDbStorage<T> {
         return jdbcTemplate.query(query, rowMapper, params);
     }
 
-    protected boolean delete(String query, long id) {
-        int rowsDeleted = jdbcTemplate.update(query, id);
-        return rowsDeleted > 0;
+    protected void delete(String query, Object... params) {
+        int rowsDeleted = jdbcTemplate.update(query, params);
+        if (rowsDeleted == 0) {
+            throw new RuntimeException("Данные для удаления не обнаружены");
+        }
     }
 
     protected void update(String query, Object... params) {

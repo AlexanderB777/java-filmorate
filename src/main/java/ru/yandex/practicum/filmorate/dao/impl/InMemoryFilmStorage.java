@@ -44,4 +44,20 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .max()
                 .orElse(0);
     }
+
+    @Override
+    public void putLike(long id, long userId) {
+        findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id))
+                .getLikes()
+                .add(userId);
+    }
+
+    @Override
+    public void deleteLike(long filmId, long userId) {
+        findById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException(filmId))
+                .getLikes()
+                .remove(userId);
+    }
 }

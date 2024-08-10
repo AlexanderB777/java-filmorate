@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -31,7 +29,6 @@ public class UserService {
     }
 
     public User createUser(User user) {
-//        user.setId(getNextId()); Переделать для inMemory
         if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
@@ -50,18 +47,22 @@ public class UserService {
         return userStorage.save(foundedUser);
     }
 
-    private long getNextId() {
-        return userStorage.findMaxId() + 1;
-    }
-
-    public void createFriendship(Long id, Long friendId) {
-        log.info("Вызван метод создающий дружбу между пользователями с Id=%d и Id=%d".formatted(id, friendId));
-        User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        log.info("Пользователь с id={} найден", id);
-        User friend = userStorage.findById(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
-        log.info("Пользователь с id={} найден", friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+    public void createFriendship(Long userId, Long friendId) {
+        log.info("Пользователем с Id={} вызван запрос на дружбу с пользователем с Id={}",userId, friendId);
+        if (userStorage.findById(userId).isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+        if (userStorage.findById(friendId).isEmpty()) {
+            throw new UserNotFoundException(friendId);
+        }
+        if (userStorage.checkReverseFriendship(userId, friendId)) {
+            log.debug("Найдена обратная заявка");
+            userStorage.confirmFriendship(userId, friendId);
+            log.info("Дружба создана");
+        } else {
+            userStorage.createFriendshipRequest(userId, friendId);
+            log.debug("Создан запрос дружбы");
+        }
         log.info("Дружба создана");
     }
 
@@ -69,7 +70,7 @@ public class UserService {
         log.info("Вызван метод удаляющий дружбу между пользователями с Id=%d и Id=%d".formatted(id, friendId));
         User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         log.info("Пользователь с id={} найден", id);
-        User friend = userStorage.findById(friendId).orElseThrow(() -> new NotFoundException(friendId));
+        User friend = userStorage.findById(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
         log.info("Пользователь с id={} найден", friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
@@ -87,6 +88,8 @@ public class UserService {
                         .map(userStorage::findById)
                         .map(Optional::orElseThrow)
                         .toList());
+
+
     }
 
     public ResponseEntity<List<User>> getCommonFriends(Long id, Long friendId) {

@@ -43,13 +43,6 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getTenPopularFilms() {
-        log.debug("Получен запрос на топ 10 фильмов");
-        return ResponseEntity.ok(filmService.getPopularFilms(10));
-    }
-
-
-    @GetMapping("/popular?count={count}")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.debug("Получен запрос на получение списка популярный фильмов в количестве %d".formatted(count));
         return ResponseEntity.ok(filmService.getPopularFilms(count));

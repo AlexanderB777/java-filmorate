@@ -13,4 +13,8 @@ public interface FilmStorage {
     Optional<Film> findById(Long id);
 
     Long findMaxId();
+
+    void putLike(long id, long userId);
+
+    void deleteLike(long filmId, long userId);
 }

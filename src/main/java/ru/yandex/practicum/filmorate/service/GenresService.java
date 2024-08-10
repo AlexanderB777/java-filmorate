@@ -25,7 +25,7 @@ public class GenresService {
         if (genre.isPresent()) {
             return genre.get();
         } else {
-            throw new GenreNotFoundException((long) id);
+            throw new GenreNotFoundException(id);
         }
     }
 }
