@@ -7,10 +7,10 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
 import ru.yandex.practicum.filmorate.dao.FriendshipStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.dao.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +33,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         super(jdbcTemplate, rowMapper);
         this.friendshipStorage = friendshipStorage;
     }
+
     @Override
     public User save(User user) {
         log.info("Сохранение пользователя: {}", user);
@@ -61,7 +62,12 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public Optional<User> findById(Long id) {
-        return findOne(FIND_BY_ID_QUERY, id);
+        Optional<User> userOptional = findOne(FIND_BY_ID_QUERY, id);
+        userOptional.ifPresent(
+                user -> user.setFriends(new HashSet<>(
+                        friendshipStorage.
+                                findFriendsIds(id))));
+        return userOptional;
     }
 
     @Override

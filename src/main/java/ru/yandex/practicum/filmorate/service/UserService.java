@@ -80,7 +80,7 @@ public class UserService {
     public ResponseEntity<List<User>> getAllFriendsFromUser(Long id) {
         log.info("Вызван метод для получения списка друзей пользователя с id={}", id);
         User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        log.info("Пользователь с id={} найден", id);
+        log.info("Пользователь с id = {} найден", id);
         Set<Long> friends = user.getFriends();
         if (friends.isEmpty()) return ResponseEntity.ok(new ArrayList<>());
         return ResponseEntity.ok(
