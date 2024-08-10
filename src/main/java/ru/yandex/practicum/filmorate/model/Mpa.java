@@ -9,4 +9,5 @@ public class Mpa {
     @Positive
     @Max(5)
     private int id;
+    private String name;
 }

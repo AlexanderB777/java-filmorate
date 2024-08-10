@@ -19,6 +19,7 @@ public class GenresService {
     public List<Genre> findAll() {
         return genresStorage.findAll();
     }
+
     public Genre findById(int id) {
         Optional<Genre> genre = genresStorage.findById(id);
         if (genre.isPresent()) {
