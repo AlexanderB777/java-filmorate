@@ -11,5 +11,4 @@ public class Friendship {
     private int id;
     private long user1_id;
     private long user2_id;
-    private boolean confirmed = false;
 }

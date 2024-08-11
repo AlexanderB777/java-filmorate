@@ -26,8 +26,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String USER_MAX_ID_QUERY = "SELECT MAX(id) FROM users";
-    private static final String FRIENDSHIP_FOUND_QUERY =
-            "SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?";
+    private static final String DELETE_FRIENDSHIP_QUERY =
+            "DELETE FROM friendship WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate, RowMapper<User> rowMapper, FriendshipStorage friendshipStorage) {
         super(jdbcTemplate, rowMapper);
@@ -76,17 +76,13 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     }
 
     @Override
-    public boolean checkReverseFriendship(long userId, long friendId) {
-        return friendshipStorage.checkFriendship(friendId, userId);
+    public void removeFriendship(long userId, long friendId) {
+        friendshipStorage.deleteFriendship(userId, friendId);
     }
 
     @Override
-    public void confirmFriendship(long userId, long friendId) {
-        friendshipStorage.confirmFriendship(userId, friendId);
+    public void createFriendship(long userId, long friendId) {
+        friendshipStorage.createFriendship(userId, friendId);
     }
 
-    @Override
-    public void createFriendshipRequest(long userId, long friendId) {
-        friendshipStorage.createFriendshipRequest(userId, friendId);
-    }
 }

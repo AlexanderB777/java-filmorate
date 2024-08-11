@@ -14,9 +14,7 @@ public interface UserStorage {
 
     Long findMaxId();
 
-    boolean checkReverseFriendship(long userId, long friendId);
+    void removeFriendship(long userId, long friendId);
 
-    void confirmFriendship(long userId,long friendId);
-
-    void createFriendshipRequest(long userId, long friendId);
+    void createFriendship(long userId, long friendId);
 }

@@ -34,10 +34,7 @@ public abstract class BaseDbStorage<T> {
     }
 
     protected void delete(String query, Object... params) {
-        int rowsDeleted = jdbcTemplate.update(query, params);
-        if (rowsDeleted == 0) {
-            throw new RuntimeException("Данные для удаления не обнаружены");
-        }
+        jdbcTemplate.update(query, params);
     }
 
     protected void update(String query, Object... params) {

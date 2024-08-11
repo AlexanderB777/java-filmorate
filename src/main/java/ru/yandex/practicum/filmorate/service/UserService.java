@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -47,6 +48,7 @@ public class UserService {
         return userStorage.save(foundedUser);
     }
 
+    @Transactional
     public void createFriendship(Long userId, Long friendId) {
         log.info("Пользователем с Id={} вызван запрос на дружбу с пользователем с Id={}",userId, friendId);
         if (userStorage.findById(userId).isEmpty()) {
@@ -55,25 +57,19 @@ public class UserService {
         if (userStorage.findById(friendId).isEmpty()) {
             throw new UserNotFoundException(friendId);
         }
-        if (userStorage.checkReverseFriendship(userId, friendId)) {
-            log.debug("Найдена обратная заявка");
-            userStorage.confirmFriendship(userId, friendId);
-            log.info("Дружба создана");
-        } else {
-            userStorage.createFriendshipRequest(userId, friendId);
-            log.debug("Создан запрос дружбы");
-        }
+        userStorage.createFriendship(userId, friendId);
         log.info("Дружба создана");
     }
 
-    public void removeFriendship(Long id, Long friendId) {
-        log.info("Вызван метод удаляющий дружбу между пользователями с Id=%d и Id=%d".formatted(id, friendId));
-        User user = userStorage.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        log.info("Пользователь с id={} найден", id);
-        User friend = userStorage.findById(friendId).orElseThrow(() -> new UserNotFoundException(friendId));
-        log.info("Пользователь с id={} найден", friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+    public void removeFriendship(Long userId, Long friendId) {
+        log.info("Вызван метод удаляющий дружбу между пользователями с Id=%d и Id=%d".formatted(userId, friendId));
+        if (userStorage.findById(userId).isEmpty()) {
+            throw new UserNotFoundException(userId);
+        }
+        if (userStorage.findById(friendId).isEmpty()) {
+            throw new UserNotFoundException(friendId);
+        }
+        userStorage.removeFriendship(userId, friendId);
         log.info("Дружба удалена");
     }
 

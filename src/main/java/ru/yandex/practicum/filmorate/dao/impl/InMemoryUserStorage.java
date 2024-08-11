@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -13,7 +11,6 @@ import java.util.*;
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private final List<Friendship> friendshipList = new ArrayList<>();
 
     @Override
     public User save(User user) {
@@ -46,23 +43,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean checkReverseFriendship(long userId, long friendId) {
-        return friendshipList.stream().anyMatch(x -> x.getUser2_id() == userId && x.getUser1_id() == friendId);
+    public void removeFriendship(long userId, long friendId) {
+        users.get(userId).getFriends().remove(friendId);
     }
 
-
     @Override
-    public void confirmFriendship(long userId, long friendId) {
-        Friendship friendship = friendshipList.stream()
-                .filter(x -> x.getUser2_id() == userId && x.getUser1_id() == friendId)
-                        .findFirst().get();
-        friendship.setConfirmed(true);
+    public void createFriendship(long userId, long friendId) {
         users.get(userId).getFriends().add(friendId);
-        users.get(friendId).getFriends().add(userId);
-    }
-
-    @Override
-    public void createFriendshipRequest(long userId, long friendId) {
-        friendshipList.add(new Friendship(friendshipList.size(), userId, friendId, false));
     }
 }
