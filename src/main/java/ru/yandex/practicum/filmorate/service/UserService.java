@@ -84,12 +84,10 @@ public class UserService {
                         .map(userStorage::findById)
                         .map(Optional::orElseThrow)
                         .toList());
-
-
     }
 
     public ResponseEntity<List<User>> getCommonFriends(Long id, Long friendId) {
-        log.info("Вызван метод по поиску общих друзей пользователей с id=%d и id=%d".formatted(id, friendId));
+        log.info("Вызван метод по поиску общих друзей пользователей с id={} и id={}", id, friendId);
         Set<Long> commonFriends = userStorage
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id))

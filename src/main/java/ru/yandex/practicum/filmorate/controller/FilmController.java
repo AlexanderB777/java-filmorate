@@ -44,20 +44,20 @@ public class FilmController {
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Получен запрос на получение списка популярный фильмов в количестве %d".formatted(count));
+        log.debug("Получен запрос на получение списка популярный фильмов в количестве {}", count);
         return ResponseEntity.ok(filmService.getPopularFilms(count));
     }
 
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<?> putLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.debug("Получен запрос на создание лайка фильму с id=%d пользователем с Id=%d".formatted(id, userId));
+        log.debug("Получен запрос на создание лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.putLike(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public ResponseEntity<?> deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.debug("Получен запрос на удаление лайка фильму с id=%d пользователем с Id=%d".formatted(id, userId));
+        log.debug("Получен запрос на удаление лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.deleteLike(id, userId);
         return ResponseEntity.noContent().build();
     }

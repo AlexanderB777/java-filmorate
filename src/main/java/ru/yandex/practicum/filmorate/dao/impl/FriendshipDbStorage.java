@@ -14,8 +14,7 @@ import java.util.List;
 @Repository
 public class FriendshipDbStorage extends BaseDbStorage implements FriendshipStorage {
     private static final String FIND_FRIENDS_BY_USER_ID = "SELECT * FROM friendship WHERE user1_id = ?";
-    private static final String CREATE_FRIENDSHIP_REQUEST =
-            "INSERT INTO friendship (user1_id, user2_id) VALUES (?, ?)";
+    private static final String CREATE_FRIENDSHIP_REQUEST = "INSERT INTO friendship (user1_id, user2_id) VALUES (?, ?)";
     private static final String DELETE_FRIENDSHIP_QUERY = "DELETE FROM friendship WHERE user1_id = ? AND user2_id = ?";
     private static final String CHECK_FRIENDSHIP_QUERY = "SELECT * FROM friendship WHERE user1_id = ? AND user2_id = ?";
 

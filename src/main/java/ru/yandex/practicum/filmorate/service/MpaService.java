@@ -28,5 +28,4 @@ public class MpaService {
             throw new MpaNotFoundException(id);
         }
     }
-
 }

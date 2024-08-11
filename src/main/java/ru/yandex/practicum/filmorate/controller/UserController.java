@@ -38,32 +38,28 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<?> createFriendship(@PathVariable Long id, @PathVariable Long friendId) {
-        log.debug(
-                "Получен запрос на создание дружбы пользователя с id %d с пользователем с id %d".formatted(id, friendId)
-        );
+        log.debug("Получен запрос на создание дружбы пользователя с id {} с пользователем с id {}", id, friendId);
         userService.createFriendship(id, friendId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<?> removeFriendship(@PathVariable Long id, @PathVariable Long friendId) {
-        log.debug(
-                "Получен запрос на удаление дружбы пользователя с id %d с пользователем с id %d".formatted(id, friendId)
-        );
+        log.debug("Получен запрос на удаление дружбы пользователя с id {} с пользователем с id {}", id, friendId);
         userService.removeFriendship(id, friendId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> showFriends(@PathVariable Long id) {
-        log.debug("Получен запрос на отображение всех друзей пользователя с id " + id);
+        log.debug("Получен запрос на отображение всех друзей пользователя с id {}",id);
         return userService.getAllFriendsFromUser(id);
     }
 
     @GetMapping("/{id}/friends/common/{friendId}")
     public ResponseEntity<List<User>> showCommonFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        log.debug(("Получен запрос на отображение списка общих друзей " +
-                "пользователя с id %d, и пользователя с id %d").formatted(id, friendId));
+        log.debug("Получен запрос на отображение списка общих друзей " +
+                "пользователя с id {}, и пользователя с id {} ", id, friendId);
         return userService.getCommonFriends(id, friendId);
     }
 }
