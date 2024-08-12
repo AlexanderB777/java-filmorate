@@ -55,14 +55,10 @@ public abstract class BaseDbStorage<T> {
             return preparedStatement;
         }, keyHolder);
         Long id = keyHolder.getKeyAs(Long.class);
-        if (id != null) {
-            return id;
-        } else {
-            throw new RuntimeException("Не удалось сохранить данные");
-        }
+        return id != null ? id : -1L;
     }
 
-    protected Long findMaxId(String query, Object... params) {
+    protected Long findMaxId(String query) {
 
         Long maxId = jdbcTemplate.queryForObject(query, Long.class);
         if (maxId == null) {

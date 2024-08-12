@@ -26,8 +26,6 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String USER_MAX_ID_QUERY = "SELECT MAX(id) FROM users";
-    private static final String DELETE_FRIENDSHIP_QUERY =
-            "DELETE FROM friendship WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate, RowMapper<User> rowMapper, FriendshipStorage friendshipStorage) {
         super(jdbcTemplate, rowMapper);
@@ -36,22 +34,23 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public User save(User user) {
-        log.info("Сохранение пользователя: {}", user);
-        if (user.getId() == null) {
-            long id = insert(INSERT_QUERY,
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    Date.valueOf(user.getBirthday()));
-            user.setId(id);
-        } else {
-            update(UPDATE_QUERY,
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    Date.valueOf(user.getBirthday()),
-                    user.getId());
-        }
+        long id = insert(INSERT_QUERY,
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                Date.valueOf(user.getBirthday()));
+        user.setId(id);
+        return user;
+    }
+
+    @Override
+    public User update(User user) {
+        update(UPDATE_QUERY,
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                Date.valueOf(user.getBirthday()),
+                user.getId());
         return user;
     }
 
@@ -84,5 +83,4 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     public void createFriendship(long userId, long friendId) {
         friendshipStorage.createFriendship(userId, friendId);
     }
-
 }

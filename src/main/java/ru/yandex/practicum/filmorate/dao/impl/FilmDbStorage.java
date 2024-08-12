@@ -25,7 +25,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     final MpaStorage mpaDbStorage;
     final GenresStorage genresDbStorage;
 
-
     private static final String FIND_ALL_QUERY = "select * from films";
     private static final String FIND_BY_ID_QUERY = "select * from films where id = ?";
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, release_date, " +
@@ -34,11 +33,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "duration = ?, mpa_id =? WHERE id = ?";
     private static final String INSERT_GENRES_QUERY = "MERGE INTO film_genres (film_id, genre_id) " +
             "KEY (film_id, genre_id) VALUES (?, ?)";
-    private static final String MAX_ID_QUERY = "SELECT MAX(id) FROM films";
     private static final String FILM_MAX_ID_QUERY = "SELECT MAX(id) FROM films";
     private static final String PUT_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES(?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-    private static final String SELECT_LIKES_FORM_FILM = "SELECT user_id FROM likes WHERE film_id = ?";
+    private static final String GET_LIKES_FROM_FILM_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> rowMapper,
@@ -129,6 +127,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     private List<Long> getLikesFromFilm(long id) {
         log.debug("Поиск лайков для фильма с id: {}", id);
-        return jdbcTemplate.query(SELECT_LIKES_FORM_FILM, new UserIdRowMapper(), id);
+        return jdbcTemplate.query(GET_LIKES_FROM_FILM_QUERY, new UserIdRowMapper(), id);
     }
 }

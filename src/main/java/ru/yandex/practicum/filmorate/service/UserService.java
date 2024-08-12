@@ -45,7 +45,7 @@ public class UserService {
         foundedUser.setName(user.getName());
         foundedUser.setBirthday(user.getBirthday());
         log.info("Обновление пользователя с ID {}", id);
-        return userStorage.save(foundedUser);
+        return userStorage.update(foundedUser);
     }
 
     @Transactional
