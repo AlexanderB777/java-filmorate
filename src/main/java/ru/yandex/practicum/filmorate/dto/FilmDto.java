@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.utils.AfterFirstFilmDate;
 
 import java.time.LocalDate;
@@ -29,12 +27,12 @@ public class FilmDto {
     @Positive(message = "Продолжительность должна быть положительным числом")
     private int duration;
     @Valid
-    private List<Genre> genres;
+    private List<GenreDto> genres;
     @Valid
     private MpaDto mpa = new MpaDto();
     private Set<Long> likes = new HashSet<>();
 
-    public @Valid List<Genre> getGenres() {
+    public @Valid List<GenreDto> getGenres() {
         return genres == null ? Collections.emptyList() : genres;
     }
 }
