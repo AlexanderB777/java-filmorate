@@ -48,7 +48,7 @@ public class FilmService {
         storedFilm.setDescription(filmDto.getDescription());
         storedFilm.setReleaseDate(filmDto.getReleaseDate());
         storedFilm.setDuration(filmDto.getDuration());
-        storedFilm.setMpa(filmDto.getMpa());
+        storedFilm.setMpa(mpaMapper.toEntity(filmDto.getMpa()));
         log.info("Фильм успешно обновлен");
         return filmMapper.toDto(filmStorage.update(storedFilm));
     }

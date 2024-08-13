@@ -31,7 +31,7 @@ public class FilmDto {
     @Valid
     private List<Genre> genres;
     @Valid
-    private Mpa mpa = new Mpa();
+    private MpaDto mpa = new MpaDto();
     private Set<Long> likes = new HashSet<>();
 
     public @Valid List<Genre> getGenres() {
