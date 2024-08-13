@@ -16,7 +16,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film save(Film film) {
+        long id = findMaxId() + 1;
+        film.setId(id);
         log.info("Сохранение фильма с названием: {}", film.getName());
+        films.put(film.getId(), film);
+        return film;
+    }
+
+    @Override
+    public Film update(Film film) {
+        log.info("Обновление фильма с названием: {}", film.getName());
         films.put(film.getId(), film);
         return film;
     }

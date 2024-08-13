@@ -50,25 +50,33 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public Film save(Film film) {
         log.info("Сохранение фильма: {}", film);
-        Long id = film.getId();
-        if (id == null) {
-            id = insert(INSERT_QUERY,
-                    film.getName(),
-                    film.getDescription(),
-                    Date.valueOf(film.getReleaseDate()),
-                    film.getDuration(),
-                    film.getMpa().getId()
-            );
-            film.setId(id);
-        } else {
-            update(UPDATE_QUERY,
-                    film.getName(),
-                    film.getDescription(),
-                    Date.valueOf(film.getReleaseDate()),
-                    film.getDuration(),
-                    film.getMpa().getId(),
-                    id);
+
+        long id = insert(INSERT_QUERY,
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration(),
+                film.getMpa().getId());
+        film.setId(id);
+
+        for (Long like : film.getLikes()) {
+            putLike(id, like);
         }
+        for (Genre genre : film.getGenres()) {
+            insert(INSERT_GENRES_QUERY, id, genre.getId());
+        }
+        return film;
+    }
+
+    public Film update(Film film) {
+        Long id = film.getId();
+        update(UPDATE_QUERY,
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration(),
+                film.getMpa().getId(),
+                id);
         for (Long like : film.getLikes()) {
             putLike(id, like);
         }
