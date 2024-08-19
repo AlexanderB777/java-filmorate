@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -16,6 +15,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User save(User user) {
         log.info("Сохранение пользователя: {}", user.getName());
+        user.setId(findMaxId() + 1);
+        users.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public User update(User user) {
         users.put(user.getId(), user);
         return user;
     }
@@ -40,5 +46,15 @@ public class InMemoryUserStorage implements UserStorage {
                 .mapToLong(id -> id)
                 .max()
                 .orElse(0);
+    }
+
+    @Override
+    public void removeFriendship(long userId, long friendId) {
+        users.get(userId).getFriends().remove(friendId);
+    }
+
+    @Override
+    public void createFriendship(long userId, long friendId) {
+        users.get(userId).getFriends().add(friendId);
     }
 }
