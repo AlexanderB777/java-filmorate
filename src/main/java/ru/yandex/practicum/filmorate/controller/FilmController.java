@@ -63,9 +63,8 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}")
-    public ResponseEntity<?> deleteFilm(@PathVariable Long filmId) {
+    public void deleteFilm(@PathVariable Long filmId) {
         log.debug("Получен запрос на удаление фильма с ID: {}", filmId);
         filmService.removeFilm(filmId);
-        return ResponseEntity.noContent().build();
     }
 }

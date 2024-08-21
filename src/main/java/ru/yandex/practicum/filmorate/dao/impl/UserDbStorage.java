@@ -26,8 +26,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String USER_MAX_ID_QUERY = "SELECT MAX(id) FROM users";
-    private static final String DELETE_USER_QUERY =
-            "DELETE FROM users WHERE id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate, RowMapper<User> rowMapper, FriendshipStorage friendshipStorage) {
         super(jdbcTemplate, rowMapper);
