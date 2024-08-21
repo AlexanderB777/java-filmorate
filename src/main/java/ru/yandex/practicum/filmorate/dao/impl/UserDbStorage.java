@@ -90,6 +90,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     public void remove(Long id) {
         log.debug("Удаление пользователя с id={}", id);
         Object[] args = new Object[] {id};
+        friendshipStorage.deleteUser(id);
         delete(DELETE_USER_QUERY, args);
     }
 }

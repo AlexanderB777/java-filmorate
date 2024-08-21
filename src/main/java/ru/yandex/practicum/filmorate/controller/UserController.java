@@ -69,4 +69,10 @@ public class UserController {
         userService.removeUser(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на получение пользователя с ID: {}", userId);
+        return userService.getUserById(userId);
+    }
 }

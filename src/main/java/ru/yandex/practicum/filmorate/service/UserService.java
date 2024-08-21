@@ -81,11 +81,8 @@ public class UserService {
         log.info("Пользователь с id = {} найден", id);
         Set<Long> friends = user.getFriends();
         if (friends.isEmpty()) return Collections.emptyList();
-        friends.stream()
-                .filter(friend -> userStorage.findById(friend).isEmpty())
-                .forEach(friend -> userStorage.removeFriendship(id, friend));
 
-        return user.getFriends().stream()
+        return friends.stream()
                 .map(userStorage::findById)
                 .map(Optional::orElseThrow)
                 .map(userMapper::toDto)
@@ -115,5 +112,13 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         log.info("Пользователь с id={} найден", id);
         userStorage.remove(id);
+    }
+
+    public UserDto getUserById(long id) {
+        log.info("Получен запрос на получение пользователя с ID: {}", id);
+        User user = userStorage.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Пользователь с id={} найден", id);
+        return userMapper.toDto(user);
     }
 }
