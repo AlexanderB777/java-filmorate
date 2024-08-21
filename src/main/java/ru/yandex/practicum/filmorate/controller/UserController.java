@@ -64,8 +64,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteFilm(@PathVariable Long userId) {
-        log.debug("Получен запрос на удаление фильма с ID: {}", userId);
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на удаление пользователя с ID: {}", userId);
         userService.removeUser(userId);
         return ResponseEntity.noContent().build();
     }

@@ -81,6 +81,10 @@ public class UserService {
         log.info("Пользователь с id = {} найден", id);
         Set<Long> friends = user.getFriends();
         if (friends.isEmpty()) return Collections.emptyList();
+        friends.stream()
+                .filter(friend -> userStorage.findById(friend).isEmpty())
+                .forEach(friend -> userStorage.removeFriendship(id, friend));
+
         return user.getFriends().stream()
                 .map(userStorage::findById)
                 .map(Optional::orElseThrow)

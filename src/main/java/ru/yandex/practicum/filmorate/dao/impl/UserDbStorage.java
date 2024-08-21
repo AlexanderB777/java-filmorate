@@ -88,7 +88,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     @Override
     public void remove(Long id) {
-        log.debug("Удаление фильма с id={}", id);
+        log.debug("Удаление пользователя с id={}", id);
         Object[] args = new Object[] {id};
         delete(DELETE_USER_QUERY, args);
     }
