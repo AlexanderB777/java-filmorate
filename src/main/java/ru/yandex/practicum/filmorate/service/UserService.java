@@ -104,4 +104,12 @@ public class UserService {
                 .map(userMapper::toDto)
                 .toList();
     }
+
+    public void removeUser(Long id) {
+        log.info("Получен запрос на удаление пользователя с ID: {}", id);
+        userStorage.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Пользователь с id={} найден", id);
+        userStorage.remove(id);
+    }
 }

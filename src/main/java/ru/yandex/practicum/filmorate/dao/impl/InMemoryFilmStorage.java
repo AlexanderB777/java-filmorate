@@ -69,4 +69,10 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .getLikes()
                 .remove(userId);
     }
+
+    @Override
+    public void remove(Long id) {
+        log.info("Удаление фильма с id{}", id);
+        films.remove(id);
+    }
 }

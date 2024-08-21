@@ -62,4 +62,11 @@ public class UserController {
                 "пользователя с id {}, и пользователя с id {} ", id, friendId);
         return ResponseEntity.ok(userService.getCommonFriends(id, friendId));
     }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteFilm(@PathVariable Long userId) {
+        log.debug("Получен запрос на удаление фильма с ID: {}", userId);
+        userService.removeUser(userId);
+        return ResponseEntity.noContent().build();
+    }
 }
