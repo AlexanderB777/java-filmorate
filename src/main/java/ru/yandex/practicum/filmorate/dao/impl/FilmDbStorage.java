@@ -4,11 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.GenresStorage;
-import ru.yandex.practicum.filmorate.dao.MpaStorage;
-import ru.yandex.practicum.filmorate.dao.mappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.dao.mappers.rowMappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.GenresStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.MpaStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -49,7 +48,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public Film save(Film film) {
-        log.info("Сохранение фильма: {}", film);
 
         long id = insert(INSERT_QUERY,
                 film.getName(),
@@ -65,6 +63,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         for (Genre genre : film.getGenres()) {
             insert(INSERT_GENRES_QUERY, id, genre.getId());
         }
+        log.info("Сохранение фильма: {}", film);
         return film;
     }
 

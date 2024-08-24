@@ -4,9 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
-import ru.yandex.practicum.filmorate.dao.FriendshipStorage;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FriendshipStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
