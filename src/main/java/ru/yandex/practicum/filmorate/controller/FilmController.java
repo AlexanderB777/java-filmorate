@@ -42,12 +42,6 @@ public class FilmController {
         return ResponseEntity.ok(filmService.updateFilm(film));
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<List<FilmDto>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Получен запрос на получение списка популярный фильмов в количестве {}", count);
-        return ResponseEntity.ok(filmService.getPopularFilms(count));
-    }
-
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<?> putLike(@PathVariable Long id, @PathVariable Long userId) {
         log.debug("Получен запрос на создание лайка фильму с id={} пользователем с Id={}", id, userId);
@@ -60,5 +54,15 @@ public class FilmController {
         log.debug("Получен запрос на удаление лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.deleteLike(id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/popular")
+    public List<FilmDto> getPopularFilmsOfGenreAndYear(
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int genreId,
+            @RequestParam(defaultValue = "0") int year) {
+        log.info("Поступил запрос на получение списка популярных фильмов по годам и жанрам.");
+        log.info("count {}, genre {} , year {}", count, genreId, year);
+        return filmService.getBestFilmsOfGenreAndYear(count, genreId, year);
     }
 }
