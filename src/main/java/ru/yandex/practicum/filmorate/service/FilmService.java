@@ -13,9 +13,7 @@ import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
@@ -113,30 +111,25 @@ public class FilmService {
     public List<FilmDto> getSearchResults(String query, String by) {
         System.out.println("search: " + query);
         System.out.println("type:" + by);
-        switch (by) {
-            case "title":
-                return findAll().stream()
-                        .map(filmDto -> getFilmById(filmDto.getId()))
-                        .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase()))
-                        .toList();
-            case "director":
-                return findAll().stream()
-                        .map(filmDto -> getFilmById(filmDto.getId()))
-                        .filter(film -> film.getDirectors().stream()
-                                .map(DirectorDto::getName)
-                                .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
-                        .toList();
-            case "director,title":
-            case "title,director":
-                return findAll().stream()
-                        .map(filmDto -> getFilmById(filmDto.getId()))
-                        .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase())
-                                || film.getDirectors().stream()
-                                .map(DirectorDto::getName)
-                                .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
-                        .toList();
-            default:
-                return new ArrayList<>();
-        }
+        return switch (by) {
+            case "title" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+            case "director" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getDirectors().stream()
+                            .map(DirectorDto::getName)
+                            .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
+                    .toList();
+            case "director,title", "title,director" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase())
+                            || film.getDirectors().stream()
+                            .map(DirectorDto::getName)
+                            .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
+                    .toList();
+            default -> new ArrayList<>();
+        };
     }
 }

@@ -8,12 +8,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.dao.mappers.DirectorRowMapper;
-import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
-import ru.yandex.practicum.filmorate.dao.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.HashMap;
 import java.util.List;
