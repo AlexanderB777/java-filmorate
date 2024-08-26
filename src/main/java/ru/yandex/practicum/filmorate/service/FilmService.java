@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
@@ -15,7 +16,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,6 +30,7 @@ public class FilmService {
     private final UserStorage userStorage;
     private final FilmMapper filmMapper;
     private final MpaMapper mpaMapper;
+    private final DirectorMapper directorMapper;
 
     public Collection<FilmDto> findAll() {
         log.info("Получен запрос на получение всех фильмов");
@@ -49,6 +53,7 @@ public class FilmService {
         storedFilm.setReleaseDate(filmDto.getReleaseDate());
         storedFilm.setDuration(filmDto.getDuration());
         storedFilm.setMpa(mpaMapper.toEntity(filmDto.getMpa()));
+        storedFilm.setDirectors(directorMapper.toEntity(filmDto.getDirectors()));
         log.info("Фильм успешно обновлен");
         return filmMapper.toDto(filmStorage.update(storedFilm));
     }
@@ -85,5 +90,21 @@ public class FilmService {
         Film film = filmStorage.findById(id)
                 .orElseThrow(() -> new FilmNotFoundException(id));
         return filmMapper.toDto(film);
+    }
+
+    public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
+        List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
+        return switch (sortBy) {
+            case "year" -> films.stream()
+                    .sorted(Comparator.comparing(Film::getReleaseDate))
+                    .map(filmMapper::toDto).toList();
+            case "likes" -> films.stream()
+                    .map(film -> filmStorage.findById(film.getId()))
+                    .map(Optional::get)
+                    .sorted(new FilmByLikeComparator().reversed())
+                    .map(filmMapper::toDto)
+                    .toList();
+            default -> null;
+        };
     }
 }

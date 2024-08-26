@@ -17,4 +17,5 @@ public class Film {
     private List<Genre> genres;
     private Mpa mpa = new Mpa();
     private Set<Long> likes = new HashSet<>();
+    private List<Director> directors;
 }
