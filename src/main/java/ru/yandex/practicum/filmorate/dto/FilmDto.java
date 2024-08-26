@@ -6,13 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.utils.AfterFirstFilmDate;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -31,6 +29,8 @@ public class FilmDto {
     @Valid
     private MpaDto mpa = new MpaDto();
     private Set<Long> likes = new HashSet<>();
+
+    private List<DirectorDto> directors = new ArrayList<>();
 
     public @Valid List<GenreDto> getGenres() {
         return genres == null ? Collections.emptyList() : genres;
