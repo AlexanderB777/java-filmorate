@@ -30,7 +30,6 @@ public class FilmService {
     private final FilmMapper filmMapper;
     private final MpaMapper mpaMapper;
     private final DirectorMapper directorMapper;
-    private final FilmDbStorage filmDbStorage;
 
     public Collection<FilmDto> findAll() {
         log.info("Получен запрос на получение всех фильмов");
@@ -93,13 +92,13 @@ public class FilmService {
     }
 
     public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
-        List<Film> films = filmDbStorage.findFilmsByDirectorId(directorId);
+        List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
         return switch (sortBy) {
             case "year" -> films.stream()
                     .sorted(Comparator.comparing(Film::getReleaseDate))
                     .map(filmMapper::toDto).toList();
             case "likes" -> films.stream()
-                    .map(film -> filmDbStorage.findById(film.getId()))
+                    .map(film -> filmStorage.findById(film.getId()))
                     .map(Optional::get)
                     .sorted(new FilmByLikeComparator().reversed())
                     .map(filmMapper::toDto)
@@ -109,8 +108,6 @@ public class FilmService {
     }
 
     public List<FilmDto> getSearchResults(String query, String by) {
-        System.out.println("search: " + query);
-        System.out.println("type:" + by);
         return switch (by) {
             case "title" -> findAll().stream()
                     .map(filmDto -> getFilmById(filmDto.getId()))
