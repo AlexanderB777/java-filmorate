@@ -8,7 +8,9 @@ import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.GenresStorage;
 import ru.yandex.practicum.filmorate.dao.MpaStorage;
+import ru.yandex.practicum.filmorate.dao.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     final MpaStorage mpaDbStorage;
     final GenresStorage genresDbStorage;
+    final FilmRowMapper filmRowMapper;
 
     private static final String FIND_ALL_QUERY = "select * from films";
     private static final String FIND_BY_ID_QUERY = "select * from films where id = ?";
@@ -32,12 +35,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE films SET name = ?, description = ?, release_date = ?, " +
             "duration = ?, mpa_id =? WHERE id = ?";
-    private static final String INSERT_GENRES_QUERY = "MERGE INTO film_genres (film_id, genre_id) " +
-            "KEY (film_id, genre_id) VALUES (?, ?)";
+    private static final String INSERT_GENRES_QUERY = "MERGE INTO film_genres (film_id, genre_id) KEY (film_id, genre_id) VALUES (?, ?)";
     private static final String FILM_MAX_ID_QUERY = "SELECT MAX(id) FROM films";
     private static final String PUT_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES(?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String GET_LIKES_FROM_FILM_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
+    private static final String INSERT_DIRECTORS_QUERY = "MERGE INTO director_films (film_id, director_id) KEY (film_id, director_id) VALUES (?, ?)";
+    private static final String SELECT_FILMS_BY_DIRECTOR_ID = "SELECT * FROM films WHERE id in (SELECT film_id FROM director_films WHERE director_id = ?)";
     private static final String FIND_COMMON_FILMS_QUERY = "SELECT f.* " +
             "FROM films f " +
             "JOIN likes l1 ON f.id = l1.film_id " +
@@ -53,10 +57,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> rowMapper,
                          MpaStorage mpaDbStorage,
-                         GenresStorage genresDbStorage) {
+                         GenresStorage genresDbStorage,
+                         FilmRowMapper filmRowMapper) {
         super(jdbcTemplate, rowMapper);
         this.mpaDbStorage = mpaDbStorage;
         this.genresDbStorage = genresDbStorage;
+        this.filmRowMapper = filmRowMapper;
     }
 
     @Override
@@ -74,9 +80,15 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         for (Long like : film.getLikes()) {
             putLike(id, like);
         }
+
         for (Genre genre : film.getGenres()) {
             insert(INSERT_GENRES_QUERY, id, genre.getId());
         }
+
+        for (Director director : film.getDirectors()) {
+            insert(INSERT_DIRECTORS_QUERY, id, director.getId());
+        }
+
         return film;
     }
 
@@ -94,6 +106,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
         for (Genre genre : film.getGenres()) {
             insert(INSERT_GENRES_QUERY, id, genre.getId());
+        }
+
+        for (Director director : film.getDirectors()) {
+            insert(INSERT_DIRECTORS_QUERY, id, director.getId());
         }
         return film;
     }
@@ -144,8 +160,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         log.debug("Удаление лайка для фильма с id={}, пользователем с id={}", filmId, userId);
         delete(DELETE_LIKE_QUERY, filmId, userId);
     }
-
-    public List<Film> findCommonFilms(long userId, long friendId) {
+  
+  public List<Film> findCommonFilms(long userId, long friendId) {
         List<Film> commonFilms = findMany(FIND_COMMON_FILMS_QUERY, userId, friendId);
         for (Film film : commonFilms) {
             film.setGenres(genresDbStorage.findByFilmId(film.getId()));
@@ -159,6 +175,10 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
+    public List<Film> findFilmsByDirectorId(int directorId) {
+        return jdbcTemplate.query(SELECT_FILMS_BY_DIRECTOR_ID, filmRowMapper, directorId);
+    }  
+  
     public void remove(Long id) {
         log.debug("Удаление фильма с id={}", id);
         delete(DELETE_FILM_FROM_LIKES_QUERY, id);
