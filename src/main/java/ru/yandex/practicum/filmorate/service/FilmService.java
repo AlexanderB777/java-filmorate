@@ -86,4 +86,9 @@ public class FilmService {
                 .orElseThrow(() -> new FilmNotFoundException(id));
         return filmMapper.toDto(film);
     }
+
+    public List<FilmDto> getRecommendation(Long id) {
+        log.info("Получение рекомендаций для пользователя");
+        return filmMapper.toDto(filmStorage.getRecommendation(id));
+    }
 }

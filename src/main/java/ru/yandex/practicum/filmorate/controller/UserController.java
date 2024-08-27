@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
@@ -61,5 +64,11 @@ public class UserController {
         log.debug("Получен запрос на отображение списка общих друзей " +
                 "пользователя с id {}, и пользователя с id {} ", id, friendId);
         return ResponseEntity.ok(userService.getCommonFriends(id, friendId));
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<List<FilmDto>> showRecommendation(@PathVariable Long id) {
+        log.debug("Получен запрос на отображение рекомендаций для пользователя с id {}",id);
+        return ResponseEntity.ok(filmService.getRecommendation(id));
     }
 }
