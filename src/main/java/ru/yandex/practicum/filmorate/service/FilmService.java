@@ -97,6 +97,11 @@ public class FilmService {
         return filmMapper.toDto(film);
     }
 
+    public List<FilmDto> getRecommendation(Long id) {
+        log.info("Получение рекомендаций для пользователя");
+        return filmMapper.toDto(filmStorage.getRecommendation(id));
+    }
+  
     public List<FilmDto> getBestFilmsOfGenreAndYear(int count, int genreId, int year) {
         List<FilmDto> films = getPopularFilms(count).stream().map(filmDto -> getFilmById(filmDto.getId())).toList();
 
