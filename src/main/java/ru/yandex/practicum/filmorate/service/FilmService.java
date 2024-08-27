@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.dao.impl.GenresDbStorage;
 import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -109,6 +111,7 @@ public class FilmService {
 
         return films.stream().filter(film -> film.getGenres().stream().anyMatch(gen -> gen.getId() == genreId)).toList();
     }
+  
     public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
         List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
         return switch (sortBy) {
@@ -124,7 +127,30 @@ public class FilmService {
             default -> null;
         };
     }
-      
+
+    public List<FilmDto> getSearchResults(String query, String by) {
+        return switch (by) {
+            case "title" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase()))
+                    .toList();
+            case "director" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getDirectors().stream()
+                            .map(DirectorDto::getName)
+                            .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
+                    .toList();
+            case "director,title", "title,director" -> findAll().stream()
+                    .map(filmDto -> getFilmById(filmDto.getId()))
+                    .filter(film -> film.getName().toLowerCase().contains(query.toLowerCase())
+                            || film.getDirectors().stream()
+                            .map(DirectorDto::getName)
+                            .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
+                    .toList();
+            default -> new ArrayList<>();
+        };
+    }
+  
     public List<FilmDto> findCommonFilms(long userId, long friendId) {
         log.info("Поиск общих фильмов для пользователей {} и {}", userId, friendId);
         List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);

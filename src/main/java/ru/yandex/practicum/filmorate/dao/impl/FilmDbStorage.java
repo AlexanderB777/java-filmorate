@@ -42,6 +42,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String GET_LIKES_FROM_FILM_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
     private static final String INSERT_DIRECTORS_QUERY = "MERGE INTO director_films (film_id, director_id) KEY (film_id, director_id) VALUES (?, ?)";
     private static final String SELECT_FILMS_BY_DIRECTOR_ID = "SELECT * FROM films WHERE id in (SELECT film_id FROM director_films WHERE director_id = ?)";
+    private static final String INSERT_DIRECTORS_QUERY = "MERGE INTO director_films (film_id, director_id) KEY (film_id, director_id) VALUES (?, ?)";
+    private static final String SELECT_FILMS_BY_DIRECTOR_ID = "SELECT * FROM films WHERE id in (SELECT film_id FROM director_films WHERE director_id = ?)";
     private static final String FIND_COMMON_FILMS_QUERY = "SELECT f.* " +
             "FROM films f " +
             "JOIN likes l1 ON f.id = l1.film_id " +
@@ -169,7 +171,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return commonFilms;
     }
 
-    private List<Long> getLikesFromFilm(long id) {
+    public List<Long> getLikesFromFilm(long id) {
         log.debug("Поиск лайков для фильма с id: {}", id);
         return jdbcTemplate.query(GET_LIKES_FROM_FILM_QUERY, new UserIdRowMapper(), id);
     }

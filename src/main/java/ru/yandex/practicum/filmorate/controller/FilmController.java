@@ -65,10 +65,16 @@ public class FilmController {
         log.info("count {}, genre {} , year {}", count, genreId, year);
         return filmService.getBestFilmsOfGenreAndYear(count, genreId, year);
     }
-
+  
     @GetMapping("/director/{directorId}")
     public List<FilmDto> getFilmByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
         return filmService.getFilmsByDirectorId(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> getSearchResults(@RequestParam String query, @RequestParam String by) {
+        log.info("Поступил запрос на получение результатов поиска по фильмам.");
+        return filmService.getSearchResults(query, by);
     }
   
     @GetMapping("/common")

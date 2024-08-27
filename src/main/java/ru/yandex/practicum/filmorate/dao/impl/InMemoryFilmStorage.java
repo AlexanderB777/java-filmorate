@@ -73,10 +73,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> findFilmsByDirectorId(int directorId) {
         return List.of();
+    }
 
+  @Override
     public List<Film> findCommonFilms(long userId, long friendId) {
         return List.of();
+    }
 
+  @Override
     public void remove(Long id) {
         log.info("Удаление фильма с id{}", id);
         films.remove(id);
