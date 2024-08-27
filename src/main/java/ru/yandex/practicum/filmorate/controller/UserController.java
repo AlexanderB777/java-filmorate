@@ -71,4 +71,16 @@ public class UserController {
         log.debug("Получен запрос на отображение рекомендаций для пользователя с id {}",id);
         return ResponseEntity.ok(filmService.getRecommendation(id));
     }
+  
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на удаление пользователя с ID: {}", userId);
+        userService.removeUser(userId);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на получение пользователя с ID: {}", userId);
+        return userService.getUserById(userId);
+    }
 }
