@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dao.impl.GenresDbStorage;
+import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.dto.DirectorDto;
@@ -16,7 +18,11 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -28,6 +34,7 @@ public class FilmService {
     private final UserStorage userStorage;
     private final FilmMapper filmMapper;
     private final MpaMapper mpaMapper;
+    private final GenresDbStorage genresDbStorage;
     private final DirectorMapper directorMapper;
 
     public Collection<FilmDto> findAll() {
@@ -90,6 +97,21 @@ public class FilmService {
         return filmMapper.toDto(film);
     }
 
+    public List<FilmDto> getBestFilmsOfGenreAndYear(int count, int genreId, int year) {
+        List<FilmDto> films = getPopularFilms(count).stream().map(filmDto -> getFilmById(filmDto.getId())).toList();
+
+        if (genreId == 0 && year == 0) return films;
+
+        if (genreId == 0) return films.stream().filter(film -> film.getReleaseDate().getYear() == year).toList();
+
+        if (year != 0) return films.stream()
+                .filter(film -> film.getReleaseDate().getYear() == year
+                        && film.getGenres().stream().anyMatch(genre -> genre.getId() == genreId))
+                .collect(Collectors.toList());
+
+        return films.stream().filter(film -> film.getGenres().stream().anyMatch(gen -> gen.getId() == genreId)).toList();
+    }
+  
     public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
         List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
         return switch (sortBy) {
@@ -127,5 +149,19 @@ public class FilmService {
                     .toList();
             default -> new ArrayList<>();
         };
+    }
+  
+    public List<FilmDto> findCommonFilms(long userId, long friendId) {
+        log.info("Поиск общих фильмов для пользователей {} и {}", userId, friendId);
+        List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
+        return filmMapper.toDto(commonFilms);
+    }  
+      
+    public void removeFilm(Long id) {
+        log.info("Получен запрос на удаление фильма с ID: {}", id);
+        filmStorage.findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id));
+        log.info("Фильм с id={} найден", id);
+        filmStorage.remove(id);
     }
 }

@@ -71,4 +71,3 @@ CREATE TABLE IF NOT EXISTS director_films
     FOREIGN KEY (film_id) REFERENCES films (id),
     FOREIGN KEY (director_id) REFERENCES directors (director_id) ON DELETE CASCADE
 );
-
