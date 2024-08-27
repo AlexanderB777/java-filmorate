@@ -91,5 +91,12 @@ public class FilmService {
         log.info("Поиск общих фильмов для пользователей {} и {}", userId, friendId);
         List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
         return filmMapper.toDto(commonFilms);
+      
+    public void removeFilm(Long id) {
+        log.info("Получен запрос на удаление фильма с ID: {}", id);
+        filmStorage.findById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id));
+        log.info("Фильм с id={} найден", id);
+        filmStorage.remove(id);
     }
 }

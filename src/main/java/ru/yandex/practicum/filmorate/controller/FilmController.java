@@ -68,5 +68,10 @@ public class FilmController {
             @RequestParam long friendId) {
         log.debug("Получен запрос на получение общих фильмов для пользователей {} и {}", userId, friendId);
         return ResponseEntity.ok(filmService.findCommonFilms(userId, friendId));
+
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable Long filmId) {
+        log.debug("Получен запрос на удаление фильма с ID: {}", filmId);
+        filmService.removeFilm(filmId);
     }
 }
