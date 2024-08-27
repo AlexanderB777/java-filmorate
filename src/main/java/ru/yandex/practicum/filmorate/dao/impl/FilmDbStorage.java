@@ -5,6 +5,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dao.mappers.rowMappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.GenresStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.MpaStorage;
 import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.dao.mappers.LikeRowMapper;
 import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
@@ -62,7 +66,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String DELETE_FILM_FROM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
     private static final String DELETE_FILM_FROM_LIKES_QUERY = "DELETE FROM likes WHERE film_id = ?";
-  
+
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> rowMapper,
@@ -99,6 +103,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             insert(INSERT_DIRECTORS_QUERY, id, director.getId());
         }
 
+        log.info("Сохранение фильма: {}", film);
         return film;
     }
 
@@ -170,7 +175,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         log.debug("Удаление лайка для фильма с id={}, пользователем с id={}", filmId, userId);
         delete(DELETE_LIKE_QUERY, filmId, userId);
     }
-  
+
   public List<Film> findCommonFilms(long userId, long friendId) {
         List<Film> commonFilms = findMany(FIND_COMMON_FILMS_QUERY, userId, friendId);
         for (Film film : commonFilms) {
@@ -210,12 +215,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
         return new ArrayList<>(recommendedFilms);
     }
-  
+
     @Override
     public List<Film> findFilmsByDirectorId(int directorId) {
         return jdbcTemplate.query(SELECT_FILMS_BY_DIRECTOR_ID, filmRowMapper, directorId);
-    }  
-  
+    }
+
     public void remove(Long id) {
         log.debug("Удаление фильма с id={}", id);
         delete(DELETE_FILM_FROM_LIKES_QUERY, id);

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao.mappers;
+package ru.yandex.practicum.filmorate.dao.mappers.rowMappers;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -8,11 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class GenreIdRowMapper implements RowMapper<Genre> {
+public class GenresRowMapper implements RowMapper<Genre> {
     @Override
     public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
         Genre genre = new Genre();
-        genre.setId(rs.getInt("genre_id"));
+        genre.setId(rs.getInt("id"));
         genre.setName(rs.getString("name"));
         return genre;
     }

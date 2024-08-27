@@ -5,8 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
-import ru.yandex.practicum.filmorate.dao.GenresStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.GenresStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;

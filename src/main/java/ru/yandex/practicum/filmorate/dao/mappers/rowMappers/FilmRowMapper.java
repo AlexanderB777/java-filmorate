@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao.mappers;
+package ru.yandex.practicum.filmorate.dao.mappers.rowMappers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;

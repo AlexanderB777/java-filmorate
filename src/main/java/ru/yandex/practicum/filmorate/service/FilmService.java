@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.dto.DirectorDto;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.UserStorage;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -101,7 +103,7 @@ public class FilmService {
         log.info("Получение рекомендаций для пользователя");
         return filmMapper.toDto(filmStorage.getRecommendation(id));
     }
-  
+
     public List<FilmDto> getBestFilmsOfGenreAndYear(int count, int genreId, int year) {
         List<FilmDto> films = getPopularFilms(count).stream().map(filmDto -> getFilmById(filmDto.getId())).toList();
 
@@ -116,7 +118,7 @@ public class FilmService {
 
         return films.stream().filter(film -> film.getGenres().stream().anyMatch(gen -> gen.getId() == genreId)).toList();
     }
-  
+
     public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
         List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
         return switch (sortBy) {
@@ -155,13 +157,13 @@ public class FilmService {
             default -> new ArrayList<>();
         };
     }
-  
+
     public List<FilmDto> findCommonFilms(long userId, long friendId) {
         log.info("Поиск общих фильмов для пользователей {} и {}", userId, friendId);
         List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
         return filmMapper.toDto(commonFilms);
-    }  
-      
+    }
+
     public void removeFilm(Long id) {
         log.info("Получен запрос на удаление фильма с ID: {}", id);
         filmStorage.findById(id)
