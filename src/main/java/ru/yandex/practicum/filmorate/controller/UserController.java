@@ -62,4 +62,16 @@ public class UserController {
                 "пользователя с id {}, и пользователя с id {} ", id, friendId);
         return ResponseEntity.ok(userService.getCommonFriends(id, friendId));
     }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на удаление пользователя с ID: {}", userId);
+        userService.removeUser(userId);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на получение пользователя с ID: {}", userId);
+        return userService.getUserById(userId);
+    }
 }
