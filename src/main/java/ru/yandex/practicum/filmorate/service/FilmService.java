@@ -87,6 +87,11 @@ public class FilmService {
         return filmMapper.toDto(film);
     }
 
+    public List<FilmDto> findCommonFilms(long userId, long friendId) {
+        log.info("Поиск общих фильмов для пользователей {} и {}", userId, friendId);
+        List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
+        return filmMapper.toDto(commonFilms);
+      
     public void removeFilm(Long id) {
         log.info("Получен запрос на удаление фильма с ID: {}", id);
         filmStorage.findById(id)

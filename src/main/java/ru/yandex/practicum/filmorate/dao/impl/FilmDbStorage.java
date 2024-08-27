@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.GenresStorage;
 import ru.yandex.practicum.filmorate.dao.MpaStorage;
 import ru.yandex.practicum.filmorate.dao.mappers.UserIdRowMapper;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -37,12 +38,18 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String PUT_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES(?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String GET_LIKES_FROM_FILM_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
+    private static final String FIND_COMMON_FILMS_QUERY = "SELECT f.* " +
+            "FROM films f " +
+            "JOIN likes l1 ON f.id = l1.film_id " +
+            "JOIN likes l2 ON f.id = l2.film_id " +
+            "WHERE l1.user_id = ? AND l2.user_id = ? " +
+            "GROUP BY f.id " +
+            "ORDER BY COUNT(l1.user_id) DESC";
+
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String DELETE_FILM_FROM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
     private static final String DELETE_FILM_FROM_LIKES_QUERY = "DELETE FROM likes WHERE film_id = ?";
-
-
-
+  
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> rowMapper,
                          MpaStorage mpaDbStorage,
@@ -136,6 +143,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public void deleteLike(long filmId, long userId) {
         log.debug("Удаление лайка для фильма с id={}, пользователем с id={}", filmId, userId);
         delete(DELETE_LIKE_QUERY, filmId, userId);
+    }
+
+    public List<Film> findCommonFilms(long userId, long friendId) {
+        List<Film> commonFilms = findMany(FIND_COMMON_FILMS_QUERY, userId, friendId);
+        for (Film film : commonFilms) {
+            film.setGenres(genresDbStorage.findByFilmId(film.getId()));
+        }
+        return commonFilms;
     }
 
     private List<Long> getLikesFromFilm(long id) {
