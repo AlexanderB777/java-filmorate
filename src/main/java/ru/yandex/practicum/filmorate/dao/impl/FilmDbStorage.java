@@ -37,6 +37,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String PUT_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES(?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
     private static final String GET_LIKES_FROM_FILM_QUERY = "SELECT user_id FROM likes WHERE film_id = ?";
+    private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
+    private static final String DELETE_FILM_FROM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
+    private static final String DELETE_FILM_FROM_LIKES_QUERY = "DELETE FROM likes WHERE film_id = ?";
+
+
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate,
                          RowMapper<Film> rowMapper,
@@ -136,5 +141,13 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private List<Long> getLikesFromFilm(long id) {
         log.debug("Поиск лайков для фильма с id: {}", id);
         return jdbcTemplate.query(GET_LIKES_FROM_FILM_QUERY, new UserIdRowMapper(), id);
+    }
+
+    @Override
+    public void remove(Long id) {
+        log.debug("Удаление фильма с id={}", id);
+        delete(DELETE_FILM_FROM_LIKES_QUERY, id);
+        delete(DELETE_FILM_FROM_GENRES_QUERY, id);
+        delete(DELETE_FILM_QUERY, id);
     }
 }

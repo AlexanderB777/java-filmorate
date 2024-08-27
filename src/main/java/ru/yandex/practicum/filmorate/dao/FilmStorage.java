@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface FilmStorage {
     Film save(Film film);
 
+    void remove(Long id);
+
     Film update(Film film);
 
     List<Film> findAll();
