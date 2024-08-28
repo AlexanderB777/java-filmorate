@@ -53,9 +53,6 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewNotFoundException(id));
         storedReview.setContent(reviewDto.getContent());
         storedReview.setIsPositive(reviewDto.getIsPositive());
-//        storedReview.setUserId(reviewDto.getUserId());
-//        storedReview.setFilmId(reviewDto.getFilmId());
-//        storedReview.setUseful(reviewDto.getUseful());
         return reviewMapper.toDto(reviewStorage.update(storedReview));
     }
 
@@ -79,15 +76,14 @@ public class ReviewService {
         if (filmId == 0 && count > 0) {
             return reviewMapper.toDto(reviewStorage.getAllWithLimit(count));
         }
+        List<Review> reviews;
         if (count > 0) {
-            List<Review> reviews = reviewStorage.getByFilmIdWithLimit(filmId, count);
-            reviews.sort(Comparator.comparing(Review::getUseful));
-            return reviewMapper.toDto(reviews.reversed());
+            reviews = reviewStorage.getByFilmIdWithLimit(filmId, count);
         } else {
-            List<Review> reviews = reviewStorage.getByFilmId(filmId);
-            reviews.sort(Comparator.comparing(Review::getUseful));
-            return reviewMapper.toDto(reviews);
+            reviews = reviewStorage.getByFilmId(filmId);
         }
+        reviews.sort(Comparator.comparing(Review::getUseful).reversed().thenComparing(Review::getReviewId));
+        return reviewMapper.toDto(reviews);
     }
 
     public ReviewDto putLike(long reviewId, long userId) {
