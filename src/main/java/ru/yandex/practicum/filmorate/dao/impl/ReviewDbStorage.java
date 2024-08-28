@@ -24,6 +24,8 @@ public class ReviewDbStorage extends BaseDbStorage implements ReviewStorage {
             "SELECT * FROM reviews WHERE film_id = ? LIMIT ?";
     private static final String INCREASE_USEFUL_QUERY = " UPDATE reviews SET useful = useful + 1 WHERE id = ?";
     private static final String DECREASE_USEFUL_QUERY = " UPDATE reviews SET useful = useful - 1 WHERE id = ?";
+    private static final String GET_ALL_QUERY = "SELECT * FROM reviews";
+    private static final String GET_ALL_WITH_LIMIT_QUERY = "SELECT * FROM reviews LIMIT ?";
 
     public ReviewDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Review> reviewRowMapper) {
         super(jdbcTemplate, reviewRowMapper);
@@ -86,5 +88,15 @@ public class ReviewDbStorage extends BaseDbStorage implements ReviewStorage {
     @Override
     public void decreaseUseful(long reviewId) {
         update(DECREASE_USEFUL_QUERY, reviewId);
+    }
+
+    @Override
+    public List<Review> getAll() {
+        return findMany(GET_ALL_QUERY);
+    }
+
+    @Override
+    public List<Review> getAllWithLimit(int limit) {
+        return findMany(GET_ALL_WITH_LIMIT_QUERY, limit);
     }
 }

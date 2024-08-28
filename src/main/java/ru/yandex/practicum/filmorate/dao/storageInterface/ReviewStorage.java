@@ -21,4 +21,8 @@ public interface ReviewStorage {
     void increaseUseful(long reviewId);
 
     void decreaseUseful(long reviewId);
+
+    List<Review> getAll();
+
+    List<Review> getAllWithLimit(int limit);
 }

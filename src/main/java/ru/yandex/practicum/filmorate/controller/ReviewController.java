@@ -42,7 +42,7 @@ public class ReviewController {
 
     @GetMapping
     public List<ReviewDto> getReviewsByFilmId(
-            @RequestParam long filmId,
+            @RequestParam(defaultValue = "0") Long filmId,
             @RequestParam(defaultValue = "0") int count) {
         log.debug("Получен запрос на получение списка ревью к фильму с id={} в количестве = {}", filmId, count);
         return reviewService.getReviewsByFilmId(filmId, count);

@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -52,9 +53,9 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewNotFoundException(id));
         storedReview.setContent(reviewDto.getContent());
         storedReview.setIsPositive(reviewDto.getIsPositive());
-        storedReview.setUserId(reviewDto.getUserId());
-        storedReview.setFilmId(reviewDto.getFilmId());
-        storedReview.setUseful(reviewDto.getUseful());
+//        storedReview.setUserId(reviewDto.getUserId());
+//        storedReview.setFilmId(reviewDto.getFilmId());
+//        storedReview.setUseful(reviewDto.getUseful());
         return reviewMapper.toDto(reviewStorage.update(storedReview));
     }
 
@@ -70,10 +71,22 @@ public class ReviewService {
     }
 
     public List<ReviewDto> getReviewsByFilmId(long filmId, int count) {
+        if (filmId == 0 && count == 0) {
+            List<Review> reviews = reviewStorage.getAll();
+            reviews.sort(Comparator.comparing(Review::getUseful));
+            return reviewMapper.toDto(reviews.reversed());
+        }
+        if (filmId == 0 && count > 0) {
+            return reviewMapper.toDto(reviewStorage.getAllWithLimit(count));
+        }
         if (count > 0) {
-            return reviewMapper.toDto(reviewStorage.getByFilmIdWithLimit(filmId, count));
+            List<Review> reviews = reviewStorage.getByFilmIdWithLimit(filmId, count);
+            reviews.sort(Comparator.comparing(Review::getUseful));
+            return reviewMapper.toDto(reviews.reversed());
         } else {
-            return reviewMapper.toDto(reviewStorage.getByFilmId(filmId));
+            List<Review> reviews = reviewStorage.getByFilmId(filmId);
+            reviews.sort(Comparator.comparing(Review::getUseful));
+            return reviewMapper.toDto(reviews);
         }
     }
 

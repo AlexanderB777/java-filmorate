@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface DirectorMapper {
-
     DirectorDto toDto(Director director);
 
     List<DirectorDto> toDto(List<Director> directors);

@@ -20,6 +20,7 @@ public class GenresDbStorage extends BaseDbStorage<Genre> implements GenresStora
     private static final String FIND_BY_ID_QUERY = "select * from genres where id = ?";
     private static final String FIND_BY_FILM_ID_QUERY = "SELECT fg.genre_id, g.name FROM film_genres AS fg " +
             "JOIN genres AS g ON fg.genre_id = g.id WHERE film_id = ?";
+    private static final String REMOVE_BY_FILM_ID_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
 
     public GenresDbStorage(JdbcTemplate jdbcTemplate,
                            @Qualifier("genresRowMapper") RowMapper<Genre> rowMapper,
@@ -41,5 +42,10 @@ public class GenresDbStorage extends BaseDbStorage<Genre> implements GenresStora
     @Override
     public List<Genre> findByFilmId(long filmId) {
         return jdbcTemplate.query(FIND_BY_FILM_ID_QUERY, genreIdRowMapper, filmId);
+    }
+
+    @Override
+    public void removeByFilmId(long filmId) {
+        delete(REMOVE_BY_FILM_ID_QUERY, filmId);
     }
 }

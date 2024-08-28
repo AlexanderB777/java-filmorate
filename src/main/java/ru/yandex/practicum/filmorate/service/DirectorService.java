@@ -3,7 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.DirectorStorage;
+import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
+import ru.yandex.practicum.filmorate.dao.storageInterface.DirectorStorage;
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
+import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.List;
@@ -13,25 +16,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectorService {
     private final DirectorStorage directorStorage;
+    private final DirectorMapper directorMapper;
 
-    public Director save(Director director) {
-        return directorStorage.save(director);
+    public DirectorDto save(DirectorDto directorDto) {
+        return directorMapper.toDto(directorStorage.save(directorMapper.toEntity(directorDto)));
     }
 
-    public Director update(Director director) {
-        return directorStorage.update(director);
+    public DirectorDto update(DirectorDto directorDto) {
+        long id = directorDto.getId();
+        Director storedDirector = directorStorage.findById(id).orElseThrow(() -> new DirectorNotFoundException(id));
+        storedDirector.setName(directorDto.getName());
+        return directorMapper.toDto(directorStorage.update(storedDirector));
     }
 
-    public void delete(int id) {
+    public void delete(long id) {
         directorStorage.deleteById(id);
     }
 
-    public List<Director> getAll() {
-        return directorStorage.getAll();
+    public List<DirectorDto> getAll() {
+        return directorMapper.toDto(directorStorage.getAll());
     }
 
-    public Director getById(int id) {
-        return directorStorage.findById(id);
+    public DirectorDto findById(long id) {
+        Director director = directorStorage.findById(id).orElseThrow(() -> new DirectorNotFoundException(id));
+        return directorMapper.toDto(director);
     }
 
 }

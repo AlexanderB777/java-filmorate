@@ -1,8 +1,9 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.storageInterface;
 
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DirectorStorage {
     Director save(Director director);
@@ -11,7 +12,9 @@ public interface DirectorStorage {
 
     List<Director> getAll();
 
-    Director findById(int id);
+    Optional<Director> findById(long id);
 
-    void deleteById(int id);
+    void deleteById(long id);
+
+    void removeByFilmId(long id);
 }

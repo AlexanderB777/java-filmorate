@@ -50,10 +50,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.debug("Получен запрос на удаление лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.deleteLike(id, userId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/popular")
@@ -68,6 +67,7 @@ public class FilmController {
   
     @GetMapping("/director/{directorId}")
     public List<FilmDto> getFilmByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
+        log.info("Получен запрос на поиск фильмов по id режиссера = {}", directorId);
         return filmService.getFilmsByDirectorId(directorId, sortBy);
     }
 

@@ -11,4 +11,6 @@ public interface GenresStorage {
     Optional<Genre> findById(int id);
 
     List<Genre> findByFilmId(long filmId);
+
+    void removeByFilmId(long filmId);
 }
