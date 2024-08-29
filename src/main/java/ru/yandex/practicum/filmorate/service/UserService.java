@@ -7,10 +7,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.dao.mappers.UserMapper;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FeedEventStorage;
 import ru.yandex.practicum.filmorate.dao.storageInterface.UserStorage;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +28,7 @@ public class UserService {
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final UserMapper userMapper;
+    private final FeedEventStorage feedEventStorage;
 
     public List<UserDto> findAll() {
         log.info("Получение списка всех пользователей");
@@ -60,6 +65,7 @@ public class UserService {
             throw new UserNotFoundException(friendId);
         }
         userStorage.createFriendship(userId, friendId);
+        feedEventStorage.addFeedEvent(new FeedEvent(userId, friendId, EventType.FRIEND, Operation.ADD));
         log.info("Дружба создана");
     }
 
@@ -72,6 +78,7 @@ public class UserService {
             throw new UserNotFoundException(friendId);
         }
         userStorage.removeFriendship(userId, friendId);
+        feedEventStorage.addFeedEvent(new FeedEvent(userId, friendId, EventType.FRIEND, Operation.REMOVE));
         log.info("Дружба удалена");
     }
 
@@ -112,6 +119,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         log.info("Пользователь с id={} найден", id);
         userStorage.remove(id);
+        feedEventStorage.removeByUserId(id);
     }
 
     public UserDto getUserById(long id) {
@@ -120,5 +128,11 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         log.info("Пользователь с id={} найден", id);
         return userMapper.toDto(user);
+    }
+
+    public List<FeedEvent> getFeed(Long userId) {
+        log.info("Получен запрос на ленту навостей пользователя с id = {}", userId);
+        userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return feedEventStorage.getFeedEvents(userId);
     }
 }

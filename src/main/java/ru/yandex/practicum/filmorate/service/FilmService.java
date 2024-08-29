@@ -9,16 +9,16 @@ import ru.yandex.practicum.filmorate.dao.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.dao.mappers.MpaMapper;
-import ru.yandex.practicum.filmorate.dao.storageInterface.DirectorStorage;
-import ru.yandex.practicum.filmorate.dao.storageInterface.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.storageInterface.MpaStorage;
-import ru.yandex.practicum.filmorate.dao.storageInterface.UserStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.*;
 import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
 
 import java.util.*;
@@ -39,6 +39,7 @@ public class FilmService {
     private final GenreMapper genreMapper;
     private final MpaStorage mpaStorage;
     private final DirectorStorage directorStorage;
+    private final FeedEventStorage feedEventStorage;
 
     public Collection<FilmDto> findAll() {
         log.info("Получен запрос на получение всех фильмов");
@@ -84,6 +85,7 @@ public class FilmService {
         userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Фильм найден");
         filmStorage.putLike(id, userId);
+        feedEventStorage.addFeedEvent(new FeedEvent(userId, id, EventType.LIKE, Operation.ADD));
         log.info("Лайк добавлен");
     }
 
@@ -92,6 +94,7 @@ public class FilmService {
         userStorage.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         log.info("Пользователь с id={} найден", userId);
         filmStorage.deleteLike(filmId, userId);
+        feedEventStorage.addFeedEvent(new FeedEvent(userId, filmId, EventType.LIKE, Operation.REMOVE));
         log.info("Лайк удален");
     }
 

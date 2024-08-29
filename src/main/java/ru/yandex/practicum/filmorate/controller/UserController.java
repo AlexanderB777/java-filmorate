@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -82,5 +83,11 @@ public class UserController {
     public UserDto getUser(@PathVariable Long userId) {
         log.debug("Получен запрос на получение пользователя с ID: {}", userId);
         return userService.getUserById(userId);
+    }
+
+    @GetMapping("/{userId}/feed")
+    public List<FeedEvent> getFeed(@PathVariable Long userId) {
+        log.debug("Получен запрос на вывод ленты событий пользователя с id = {}", userId);
+        return userService.getFeed(userId);
     }
 }

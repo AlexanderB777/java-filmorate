@@ -12,7 +12,10 @@ import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +32,7 @@ public class ReviewService {
     private final FilmStorage filmStorage;
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    private final FeedEventStorage feedEventStorage;
 
     public ReviewDto create(ReviewDto reviewDto) {
         Review review = reviewMapper.toEntity(reviewDto);
@@ -37,7 +41,14 @@ public class ReviewService {
         } else if (userStorage.findById(review.getUserId()).isEmpty()) {
             throw new UserNotFoundException(review.getUserId());
         } else {
-            return reviewMapper.toDto(reviewStorage.save(review));
+            review = reviewStorage.save(review);
+            feedEventStorage.addFeedEvent(
+                    new FeedEvent(review.getUserId(),
+                            review.getReviewId(),
+                            EventType.REVIEW,
+                            Operation.ADD)
+            );
+            return reviewMapper.toDto(review);
         }
     }
 
@@ -53,10 +64,23 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewNotFoundException(id));
         storedReview.setContent(reviewDto.getContent());
         storedReview.setIsPositive(reviewDto.getIsPositive());
+        feedEventStorage.addFeedEvent(
+                new FeedEvent(storedReview.getUserId(),
+                        id,
+                        EventType.REVIEW,
+                        Operation.UPDATE)
+        );
         return reviewMapper.toDto(reviewStorage.update(storedReview));
     }
 
     public void delete(long id) {
+        Review review = reviewStorage.findById(id).orElseThrow(() -> new ReviewNotFoundException(id));
+        feedEventStorage.addFeedEvent(
+                new FeedEvent(review.getUserId(),
+                        review.getReviewId(),
+                        EventType.REVIEW,
+                        Operation.REMOVE)
+        );
         reviewStorage.delete(id);
     }
 
