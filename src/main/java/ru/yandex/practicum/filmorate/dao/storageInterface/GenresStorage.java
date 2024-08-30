@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.storageInterface;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -11,4 +11,6 @@ public interface GenresStorage {
     Optional<Genre> findById(int id);
 
     List<Genre> findByFilmId(long filmId);
+
+    void removeByFilmId(long filmId);
 }

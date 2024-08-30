@@ -42,12 +42,6 @@ public class FilmController {
         return ResponseEntity.ok(filmService.updateFilm(film));
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<List<FilmDto>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Получен запрос на получение списка популярный фильмов в количестве {}", count);
-        return ResponseEntity.ok(filmService.getPopularFilms(count));
-    }
-
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<?> putLike(@PathVariable Long id, @PathVariable Long userId) {
         log.debug("Получен запрос на создание лайка фильму с id={} пользователем с Id={}", id, userId);
@@ -56,9 +50,44 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.debug("Получен запрос на удаление лайка фильму с id={} пользователем с Id={}", id, userId);
         filmService.deleteLike(id, userId);
-        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/popular")
+    public List<FilmDto> getPopularFilmsOfGenreAndYear(
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int genreId,
+            @RequestParam(defaultValue = "0") int year) {
+        log.info("Поступил запрос на получение списка популярных фильмов по годам и жанрам.");
+        log.info("count {}, genre {} , year {}", count, genreId, year);
+        return filmService.getBestFilmsOfGenreAndYear(count, genreId, year);
+    }
+  
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
+        log.info("Получен запрос на поиск фильмов по id режиссера = {}", directorId);
+        return filmService.getFilmsByDirectorId(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> getSearchResults(@RequestParam String query, @RequestParam String by) {
+        log.info("Поступил запрос на получение результатов поиска по фильмам.");
+        return filmService.getSearchResults(query, by);
+    }
+  
+    @GetMapping("/common")
+    public ResponseEntity<List<FilmDto>> getCommonFilms(
+            @RequestParam long userId,
+            @RequestParam long friendId) {
+        log.debug("Получен запрос на получение общих фильмов для пользователей {} и {}", userId, friendId);
+        return ResponseEntity.ok(filmService.findCommonFilms(userId, friendId));
+    }  
+
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable Long filmId) {
+        log.debug("Получен запрос на удаление фильма с ID: {}", filmId);
+        filmService.removeFilm(filmId);
     }
 }

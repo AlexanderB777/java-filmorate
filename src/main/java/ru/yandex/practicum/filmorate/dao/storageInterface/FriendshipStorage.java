@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.storageInterface;
 
 import java.util.List;
 
@@ -8,4 +8,6 @@ public interface FriendshipStorage {
     void createFriendship(long userId, long friendId);
 
     void deleteFriendship(long userId, long friendId);
+
+    void deleteUser(long userId);
 }

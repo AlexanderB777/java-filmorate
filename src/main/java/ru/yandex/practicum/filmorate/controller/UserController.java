@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
@@ -61,5 +65,29 @@ public class UserController {
         log.debug("Получен запрос на отображение списка общих друзей " +
                 "пользователя с id {}, и пользователя с id {} ", id, friendId);
         return ResponseEntity.ok(userService.getCommonFriends(id, friendId));
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<List<FilmDto>> showRecommendation(@PathVariable Long id) {
+        log.debug("Получен запрос на отображение рекомендаций для пользователя с id {}",id);
+        return ResponseEntity.ok(filmService.getRecommendation(id));
+    }
+  
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на удаление пользователя с ID: {}", userId);
+        userService.removeUser(userId);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable Long userId) {
+        log.debug("Получен запрос на получение пользователя с ID: {}", userId);
+        return userService.getUserById(userId);
+    }
+
+    @GetMapping("/{userId}/feed")
+    public List<FeedEvent> getFeed(@PathVariable Long userId) {
+        log.debug("Получен запрос на вывод ленты событий пользователя с id = {}", userId);
+        return userService.getFeed(userId);
     }
 }

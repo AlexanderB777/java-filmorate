@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.BaseDbStorage;
-import ru.yandex.practicum.filmorate.dao.FriendshipStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FriendshipStorage;
 import ru.yandex.practicum.filmorate.model.Friendship;
 
 import java.util.List;
@@ -17,6 +16,7 @@ public class FriendshipDbStorage extends BaseDbStorage implements FriendshipStor
     private static final String CREATE_FRIENDSHIP_QUERY = "INSERT INTO friendship (user1_id, user2_id) VALUES (?, ?)";
     private static final String DELETE_FRIENDSHIP_QUERY = "DELETE FROM friendship WHERE user1_id = ? AND user2_id = ?";
     private static final String CHECK_FRIENDSHIP_QUERY = "SELECT * FROM friendship WHERE user1_id = ? AND user2_id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM friendship WHERE user2_id = ? OR user1_id = ?";
 
     public FriendshipDbStorage(JdbcTemplate jdbcTemplate, RowMapper<Friendship> rowMapper) {
         super(jdbcTemplate, rowMapper);
@@ -38,5 +38,10 @@ public class FriendshipDbStorage extends BaseDbStorage implements FriendshipStor
     @Override
     public void deleteFriendship(long userId, long friendId) {
         delete(DELETE_FRIENDSHIP_QUERY, userId, friendId);
+    }
+
+    @Override
+    public void deleteUser(long userId) {
+        delete(DELETE_USER_QUERY, userId, userId);
     }
 }

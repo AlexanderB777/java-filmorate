@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -56,5 +56,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void createFriendship(long userId, long friendId) {
         users.get(userId).getFriends().add(friendId);
+    }
+
+    @Override
+    public void remove(Long id) {
+        log.info("Удаление пользователя с id{}", id);
+        users.remove(id);
     }
 }

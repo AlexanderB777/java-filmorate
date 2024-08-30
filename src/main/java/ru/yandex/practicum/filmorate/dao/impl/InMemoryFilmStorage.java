@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.storageInterface.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -68,5 +68,26 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .orElseThrow(() -> new FilmNotFoundException(filmId))
                 .getLikes()
                 .remove(userId);
+    }
+
+    @Override
+    public List<Film> getRecommendation(Long id) {
+        return List.of();
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorId(int directorId) {
+        return List.of();
+    }
+
+  @Override
+    public List<Film> findCommonFilms(long userId, long friendId) {
+        return List.of();
+    }
+
+  @Override
+    public void remove(Long id) {
+        log.info("Удаление фильма с id{}", id);
+        films.remove(id);
     }
 }
