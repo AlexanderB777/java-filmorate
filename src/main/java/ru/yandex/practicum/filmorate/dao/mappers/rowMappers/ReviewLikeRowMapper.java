@@ -15,6 +15,7 @@ public class ReviewLikeRowMapper implements RowMapper<ReviewLike> {
         reviewLike.setId(rs.getLong("id"));
         reviewLike.setReviewId(rs.getLong("review_id"));
         reviewLike.setUserId(rs.getLong("user_id"));
+        reviewLike.setPositive(rs.getBoolean("positive"));
         return reviewLike;
     }
 }

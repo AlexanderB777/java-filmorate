@@ -7,4 +7,5 @@ public class ReviewLike {
     private long id;
     private long reviewId;
     private long userId;
+    private boolean isPositive;
 }

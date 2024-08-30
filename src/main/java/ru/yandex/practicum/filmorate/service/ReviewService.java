@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.dao.mappers.ReviewMapper;
 import ru.yandex.practicum.filmorate.dao.storageInterface.*;
@@ -27,38 +28,38 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final ReviewMapper reviewMapper;
     private final ReviewLikeStorage reviewLikeStorage;
-    private final ReviewDislikeStorage reviewDislikeStorage;
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final FeedEventStorage feedEventStorage;
 
+    @Transactional
     public ReviewDto create(ReviewDto reviewDto) {
         Review review = reviewMapper.toEntity(reviewDto);
         if (filmStorage.findById(review.getFilmId()).isEmpty()) {
             throw new FilmNotFoundException(review.getFilmId());
-        } else if (userStorage.findById(review.getUserId()).isEmpty()) {
-            throw new UserNotFoundException(review.getUserId());
-        } else {
-            review = reviewStorage.save(review);
-            feedEventStorage.addFeedEvent(
-                    new FeedEvent(review.getUserId(),
-                            review.getReviewId(),
-                            EventType.REVIEW,
-                            Operation.ADD)
-            );
-            return reviewMapper.toDto(review);
         }
+        if (userStorage.findById(review.getUserId()).isEmpty()) {
+            throw new UserNotFoundException(review.getUserId());
+        }
+        review = reviewStorage.save(review);
+        feedEventStorage.addFeedEvent(
+                new FeedEvent(review.getUserId(),
+                        review.getReviewId(),
+                        EventType.REVIEW,
+                        Operation.ADD)
+        );
+        return reviewMapper.toDto(review);
     }
 
+    @Transactional
     public ReviewDto update(ReviewDto reviewDto) {
-        long id;
         if (reviewDto.getReviewId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Для обновления объект должен содержать id");
-        } else {
-            id = reviewDto.getReviewId();
         }
+        long id = reviewDto.getReviewId();
+
         Review storedReview = reviewStorage
                 .findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException(id));
@@ -110,53 +111,70 @@ public class ReviewService {
         return reviewMapper.toDto(reviews);
     }
 
-    public ReviewDto putLike(long reviewId, long userId) {
-        if (reviewLikeStorage.isReviewLiked(reviewId, userId)) {
-            return null;
+    public ReviewDto putLike(long reviewId, long userId, boolean isPositive) {
+
+        switch (reviewLikeStorage.isReviewLiked(reviewId, userId)) {
+            case (0) -> {
+                reviewLikeStorage.createReviewLike(reviewId, userId, isPositive);
+                if (isPositive) {
+                    reviewStorage.increaseUseful(reviewId);
+                } else {
+                    reviewStorage.decreaseUseful(reviewId);
+                }
+            }
+
+            case (-1) -> {
+                if (isPositive) {
+                    reviewLikeStorage.updateReviewLike(reviewId, userId, true);
+                    reviewStorage.increaseUseful(reviewId);
+                    reviewStorage.increaseUseful(reviewId);
+                } else {
+                    return null;
+                }
+            }
+
+            case (1) -> {
+                if (isPositive) {
+                    return null;
+                } else {
+                    reviewLikeStorage.updateReviewLike(reviewId, userId, false);
+                    reviewStorage.decreaseUseful(reviewId);
+                    reviewStorage.decreaseUseful(reviewId);
+                }
+            }
         }
-        if (reviewDislikeStorage.isReviewDisliked(reviewId, userId)) {
-            reviewDislikeStorage.deleteReviewDislike(reviewId, userId);
-            reviewStorage.increaseUseful(reviewId);
-        }
-        reviewLikeStorage.createReviewLike(reviewId, userId);
-        reviewStorage.increaseUseful(reviewId);
         return reviewMapper
                 .toDto(reviewStorage
                         .findById(reviewId)
                         .orElseThrow(() -> new ReviewNotFoundException(reviewId)));
     }
 
-    public ReviewDto putDislike(long reviewId, long userId) {
-        if (reviewDislikeStorage.isReviewDisliked(reviewId, userId)) {
-            return null;
-        }
-        if (reviewLikeStorage.isReviewLiked(reviewId, userId)) {
-            reviewLikeStorage.deleteReviewLike(reviewId, userId);
-            reviewStorage.decreaseUseful(reviewId);
-        }
-        reviewStorage.decreaseUseful(reviewId);
-        reviewDislikeStorage.createReviewDislike(reviewId, userId);
-        return reviewMapper
-                .toDto(reviewStorage
-                        .findById(reviewId)
-                        .orElseThrow(() -> new ReviewNotFoundException(reviewId)));
-    }
+    public ReviewDto deleteLike(long reviewId, long userId, boolean isPositive) {
+        int liked = reviewLikeStorage.isReviewLiked(reviewId, userId);
 
-    public ReviewDto deleteDislike(long reviewId, long userId) {
-        if (reviewDislikeStorage.isReviewDisliked(reviewId, userId)) {
-            reviewDislikeStorage.deleteReviewDislike(reviewId, userId);
-            reviewStorage.increaseUseful(reviewId);
-        }
-        return reviewMapper
-                .toDto(reviewStorage
-                        .findById(reviewId)
-                        .orElseThrow(() -> new ReviewNotFoundException(reviewId)));
-    }
+        switch (liked) {
+            case (0) -> {
+                return null;
+            }
 
-    public ReviewDto deleteLike(long reviewId, long userId) {
-        if (reviewLikeStorage.isReviewLiked(reviewId, userId)) {
-            reviewLikeStorage.deleteReviewLike(reviewId, userId);
-            reviewStorage.decreaseUseful(reviewId);
+            case (-1) -> {
+                if (isPositive) {
+                    return null;
+                } else {
+                    reviewLikeStorage.deleteReviewLike(reviewId, userId);
+                    reviewStorage.increaseUseful(reviewId);
+                }
+            }
+
+            case (1) -> {
+                if (isPositive) {
+                    reviewLikeStorage.deleteReviewLike(reviewId, userId);
+                    reviewStorage.decreaseUseful(reviewId);
+                } else {
+                    return null;
+                }
+            }
+
         }
         return reviewMapper
                 .toDto(reviewStorage

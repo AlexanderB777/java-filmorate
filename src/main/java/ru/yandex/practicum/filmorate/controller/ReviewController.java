@@ -51,24 +51,24 @@ public class ReviewController {
     @PutMapping("/{reviewId}/like/{userId}")
     public ReviewDto putLike(@PathVariable long reviewId, @PathVariable long userId) {
         log.debug("Получен запрос на добавление лайка отзыву с id = {} пользователем с id = {}", reviewId, userId);
-        return reviewService.putLike(reviewId, userId);
+        return reviewService.putLike(reviewId, userId, true);
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
     public ReviewDto putDislike(@PathVariable long reviewId, @PathVariable long userId) {
         log.debug("Получен запрос на добавление дизлайка отзыву с id = {} пользователем с id = {}", reviewId, userId);
-        return reviewService.putDislike(reviewId, userId);
+        return reviewService.putLike(reviewId, userId, false);
     }
 
     @DeleteMapping("/{reviewId}/like/{userId}")
     public ReviewDto deleteLike(@PathVariable long reviewId, @PathVariable long userId) {
         log.debug("Получен запрос на удаление лайка у отзыва с id = {} пользователем с id = {}", reviewId, userId);
-        return reviewService.deleteLike(reviewId, userId);
+        return reviewService.deleteLike(reviewId, userId, true);
     }
 
     @DeleteMapping("/{reviewId}/dislike/{userId}")
     public ReviewDto deleteDislike(@PathVariable long reviewId, @PathVariable long userId) {
         log.debug("Получен запрос на удаление дизлайка у отзыва с id = {} пользователем с id = {}", reviewId, userId);
-        return reviewService.deleteDislike(reviewId, userId);
+        return reviewService.deleteLike(reviewId, userId, false);
     }
 }

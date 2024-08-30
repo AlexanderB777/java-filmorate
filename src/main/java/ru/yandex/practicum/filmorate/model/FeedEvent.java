@@ -23,11 +23,11 @@ public class FeedEvent {
         this.operation = operation;
     }
 
-    Long eventId;
-    Long userId;
-    Long entityId;
-    EventType eventType;
-    Operation operation;
+    private Long eventId;
+    private Long userId;
+    private Long entityId;
+    private EventType eventType;
+    private Operation operation;
     @JsonSerialize(using = TimestampSerializer.class)
-    Timestamp timestamp;
+    private Timestamp timestamp;
 }

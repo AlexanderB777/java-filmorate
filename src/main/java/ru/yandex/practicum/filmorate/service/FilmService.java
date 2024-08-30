@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.utils.FilmByLikeComparator;
+import ru.yandex.practicum.filmorate.utils.FilmDtoByIdComparator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class FilmService {
         log.info("Вызван метод по поиску популярных фильмов в количестве {}", count);
         List<Film> all = filmStorage.findAll();
         List<FilmDto> result = all.stream()
-                .sorted(new FilmByLikeComparator().reversed())
+                .sorted(new FilmByLikeComparator())
                 .limit(count)
                 .map(filmMapper::toDto)
                 .toList();
@@ -127,6 +128,9 @@ public class FilmService {
     public List<FilmDto> getFilmsByDirectorId(int directorId, String sortBy) {
         directorStorage.findById(directorId).orElseThrow(() -> new DirectorNotFoundException(directorId));
         List<Film> films = filmStorage.findFilmsByDirectorId(directorId);
+        if (films.isEmpty()) {
+            return Collections.emptyList();
+        }
         for (Film film : films) {
             film.setGenres(genresDbStorage.findByFilmId(film.getId()));
             film.setMpa(mpaStorage.findById(film.getMpa().getId()).get());
@@ -134,14 +138,17 @@ public class FilmService {
         return switch (sortBy) {
             case "year" -> films.stream()
                     .sorted(Comparator.comparing(Film::getReleaseDate))
-                    .map(filmMapper::toDto).toList();
+                    .map(filmMapper::toDto)
+                    .toList();
             case "likes" -> films.stream()
                     .map(film -> filmStorage.findById(film.getId()))
                     .map(Optional::get)
-                    .sorted(new FilmByLikeComparator().reversed())
+                    .sorted(new FilmByLikeComparator())
                     .map(filmMapper::toDto)
                     .toList();
-            default -> null;
+            default -> films.stream()
+                    .map(filmMapper::toDto)
+                    .toList();
         };
     }
 
@@ -163,7 +170,11 @@ public class FilmService {
                             || film.getDirectors().stream()
                             .map(DirectorDto::getName)
                             .anyMatch(name -> name.toLowerCase().contains(query.toLowerCase())))
-                    .toList().reversed();
+                    .sorted(new FilmDtoByIdComparator())
+                    .toList();
+
+
+            ////////////////////////////////////////////////////////////////////////////////////
             default -> new ArrayList<>();
         };
     }
